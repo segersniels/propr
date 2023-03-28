@@ -108,7 +108,17 @@
 .message ul {
   @apply font-light
     list-disc
-    list-inside;
+    list-inside
+    ml-4;
+}
+
+.message code {
+  @apply text-sm
+    font-light
+    text-gray-700
+    bg-gray-100
+    p-1
+    rounded-lg;
 }
 
 .gitmoji {
