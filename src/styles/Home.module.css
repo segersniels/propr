@@ -1,8 +1,7 @@
 .container {
   @apply flex
-    max-w-5xl
+    flex-row
     mx-auto
-    flex-col
     items-center
     justify-center
     p-4
@@ -10,19 +9,54 @@
 }
 
 .wrapper {
-  @apply max-w-xl
-    w-full;
+  @apply flex
+    flex-col
+    flex-1
+    max-w-xl
+    w-full
+    items-center;
+}
+
+.subtitle {
+  @apply font-light;
 }
 
 .title {
-  @apply text-6xl
+  @apply text-7xl
     font-bold
     text-center
+    tracking-tighter
     mb-8;
 }
 
+.form {
+  @apply flex
+    flex-col
+    w-full;
+}
+
+.decimal {
+  @apply rounded-full
+    text-white
+    bg-black
+    flex
+    items-center
+    justify-center
+    w-6
+    h-6
+    mr-2;
+}
+
+.step {
+  @apply list-decimal
+    list-inside
+    font-light
+    text-lg
+    antialiased;
+}
+
 .textarea {
-  @apply w-full
+  @apply flex-1
     font-mono
     text-sm
     rounded-md
@@ -33,7 +67,7 @@
     focus:border-gray-800
     focus:ring-black
     p-2
-    my-2;
+    my-4;
 }
 
 .button {
@@ -74,7 +108,7 @@
 .message ul {
   @apply font-light
     list-disc
-    ml-4;
+    list-inside;
 }
 
 .gitmoji {

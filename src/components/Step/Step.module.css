@@ -1,0 +1,19 @@
+.decimal {
+  @apply rounded-full
+    text-white
+    bg-black
+    flex
+    items-center
+    justify-center
+    w-6
+    h-6
+    mr-2;
+}
+
+.step {
+  @apply list-decimal
+    list-inside
+    font-light
+    text-lg
+    antialiased;
+}
