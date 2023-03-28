@@ -14,7 +14,7 @@ export default async function handler(req: NextRequest) {
   const body = await req.json();
   const prompt = `
     Generate a concise PR description from the provided git diff according to a provided template.
-    Be thorough and concise. The PR description should be a good summary of the changes made.
+    The PR description should be a good summary of the changes made.
 
     Do not reference each file and function added but rather give a general explanation of the changes made.
     Don't mention each change individually, but rather group them together.
