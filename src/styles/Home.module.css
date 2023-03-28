@@ -1,0 +1,82 @@
+.container {
+  @apply flex
+    max-w-5xl
+    mx-auto
+    flex-col
+    items-center
+    justify-center
+    p-4
+    min-h-screen;
+}
+
+.wrapper {
+  @apply max-w-xl
+    w-full;
+}
+
+.title {
+  @apply text-6xl
+    font-bold
+    text-center
+    mb-8;
+}
+
+.textarea {
+  @apply w-full
+    font-mono
+    text-sm
+    rounded-md
+    border
+    border-gray-300
+    shadow-sm
+    focus:outline-none
+    focus:border-gray-800
+    focus:ring-black
+    p-2
+    my-2;
+}
+
+.button {
+  @apply flex
+    w-full
+    h-10
+    justify-center
+    items-center
+    bg-black
+    rounded-xl
+    text-white
+    font-medium
+    px-4
+    py-2
+    hover:bg-black/80
+    disabled:bg-black/50;
+}
+
+.message {
+  @apply flex
+    flex-col
+    p-4
+    pl-6
+    shadow-md
+    rounded-2xl
+    border
+    border-gray-100
+    hover:bg-gray-50
+    cursor-copy;
+}
+
+.message h3 {
+  @apply my-2
+    font-semibold
+    whitespace-pre-wrap;
+}
+
+.message ul {
+  @apply font-light
+    list-disc
+    ml-4;
+}
+
+.gitmoji {
+  @apply underline;
+}
