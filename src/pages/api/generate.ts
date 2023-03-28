@@ -1,10 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { generate } from 'lib/api';
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<any>
-) {
+export const config = {
+  runtime: 'edge',
+};
+
+export default async function handler(req: NextRequest) {
+  const body = await req.json();
   const prompt = `
     Generate a concise PR description from the provided git diff according to a provided template.
     Be thorough and concise. The PR description should be a good summary of the changes made. Don't be afraid to go into detail.
@@ -14,17 +16,17 @@ export default async function handler(
     It implies that you added tests in the first place.
 
     Here is the template: """
-    ${req.body.template}
+    ${body.template}
     """
 
     Here is the diff: """
-    ${req.body.diff}
+    ${body.diff}
     """
   `;
 
   const message = await generate(prompt);
 
-  return res.status(200).json({
+  return NextResponse.json({
     message,
   });
 }
