@@ -112,7 +112,7 @@ export default function Home() {
           Why wait until GitHub Copilot X is here...
         </p>
         <h1 className={styles.title}>
-          Generate your next Pull Request description using ChatGPT
+          Generate your next proper PR description using ChatGPT
         </h1>
 
         <form className={styles.form} onSubmit={handleSubmit}>

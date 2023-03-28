@@ -25,6 +25,9 @@ export default function Document() {
           name="twitter:description"
           content="Generate proper pull request descriptions"
         />
+
+        <meta property="og:image" content="https://propr.dev/og-image.png" />
+        <meta name="twitter:image" content="https://propr.dev/og-image.png" />
       </Head>
       <body>
         <Main />
