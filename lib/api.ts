@@ -1,7 +1,11 @@
 import { Configuration, OpenAIApi } from 'openai';
+import fetchAdapter from '@vespaiach/axios-fetch-adapter';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
+  baseOptions: {
+    adapter: fetchAdapter,
+  },
 });
 
 const openai = new OpenAIApi(configuration);
