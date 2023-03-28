@@ -7,7 +7,6 @@ import {
   useState,
 } from 'react';
 import styles from 'styles/Home.module.css';
-import Footer from 'components/Footer';
 import { AiOutlineLoading } from 'react-icons/ai';
 import ReactMarkdown from 'react-markdown';
 import Step from 'components/Step';
@@ -169,8 +168,6 @@ export default function Home() {
           </>
         )}
       </div>
-
-      <Footer />
     </div>
   );
 }
