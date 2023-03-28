@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
-import { OpenAIStream, OpenAIStreamPayload } from 'helpers/Stream';
+import { OpenAIStream } from 'helpers/Stream';
+import { removeLockfileChanges } from 'helpers/Prompt';
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('Missing env var from OpenAI');
@@ -31,7 +32,7 @@ export default async function handler(req: NextRequest) {
     """
 
     Here is the diff: """
-    ${body.diff}
+    ${removeLockfileChanges(body.diff)}
     """
   `;
 
