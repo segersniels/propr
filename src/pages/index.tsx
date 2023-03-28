@@ -103,7 +103,7 @@ export default function Home() {
 
         while (true) {
           const { value, done } = await reader.read();
-          setMessage(decoder.decode(value));
+          setMessage((prev) => prev + decoder.decode(value));
 
           if (done) {
             break;
