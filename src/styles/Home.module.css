@@ -96,7 +96,20 @@
     border
     border-gray-100
     hover:bg-gray-50
-    cursor-copy;
+    cursor-copy
+    font-light;
+}
+
+.message h1 {
+  @apply my-2
+    font-semibold
+    whitespace-pre-wrap;
+}
+
+.message h2 {
+  @apply my-2
+    font-semibold
+    whitespace-pre-wrap;
 }
 
 .message h3 {
@@ -106,15 +119,13 @@
 }
 
 .message ul {
-  @apply font-light
-    list-disc
+  @apply list-disc
     list-inside
     ml-4;
 }
 
 .message code {
   @apply text-sm
-    font-light
     text-gray-700
     bg-gray-100
     p-1
