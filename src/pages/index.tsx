@@ -78,6 +78,7 @@ export default function Home() {
     async (event: FormEvent<HTMLFormElement>) => {
       try {
         event.preventDefault();
+        setMessage('');
         setIsGenerating(true);
 
         const response = await fetch('/api/generate', {
