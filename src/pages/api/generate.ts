@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { OpenAIStream } from 'helpers/Stream';
-import { removeLockfileChanges } from 'helpers/Prompt';
+import { prepareDiff } from 'helpers/Prompt';
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('Missing OPENAI_API_KEY environment variable');
@@ -32,7 +32,7 @@ export default async function handler(req: NextRequest) {
     """
 
     Here is the diff: """
-    ${removeLockfileChanges(body.diff)}
+    ${prepareDiff(body.diff)}
     """
   `;
 
