@@ -21,7 +21,11 @@ function removeExcessiveLinesFromChunk(diff: string) {
  * Prepare a diff for use in the prompt by removing stuff like
  * the lockfile changes and removing some of the whitespace.
  */
-export function prepareDiff(diff: string) {
+function prepareDiff(diff: string, minify = false) {
+  if (!minify) {
+    return diff;
+  }
+
   const chunks = Array.from(
     diff.matchAll(/diff --git[\s\S]*?(?=diff --git|$)/g),
     (match) => match[0]
@@ -41,4 +45,27 @@ export function prepareDiff(diff: string) {
     })
     .map(removeExcessiveLinesFromChunk)
     .join('\n');
+}
+
+export function generatePrompt(diff: string, template: string, minify = false) {
+  return `
+    Generate a concise PR description from the provided git diff according to a provided template.
+    The PR description should be a good summary of the changes made.
+    Do not reference each file and function added but rather give a general explanation of the changes made.
+    Don't mention each change individually, but rather group them together.
+    You are free to make a calculated guess as to which changes and files are related to each other so you can group them together.
+    When endpoints/routes are in the diff try to reference these when describing features.
+    It's not worth mentioning that you added tests when you mention you added a new feature as it implies that you added tests in the first place.
+    If notes or reason why the change happened are requested, make sure you try to explain the reasoning without using too much technical jargon.
+    If a section has no content, you can leave the entire section out.
+    If the diff provided is not actually a diff I want you to respond with an appropriate message accordingly.
+
+    The PR description should be structured as follows: """
+    ${template}
+    """
+
+    Here is the diff: """
+    ${prepareDiff(diff, minify)}
+    """
+  `;
 }

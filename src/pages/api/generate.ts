@@ -1,6 +1,10 @@
 import { NextRequest } from 'next/server';
 import { OpenAIStream } from 'helpers/Stream';
-import { prepareDiff } from 'helpers/Prompt';
+import { generatePrompt } from 'helpers/Prompt';
+// @ts-expect-error
+import wasm from 'resources/tiktoken_bg.wasm?module';
+import model from '@dqbd/tiktoken/encoders/cl100k_base.json';
+import { init, Tiktoken } from '@dqbd/tiktoken/lite/init';
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('Missing OPENAI_API_KEY environment variable');
@@ -11,27 +15,27 @@ export const config = {
 };
 
 export default async function handler(req: NextRequest) {
+  await init((imports) => WebAssembly.instantiate(wasm, imports));
+  const encoding = new Tiktoken(
+    model.bpe_ranks,
+    model.special_tokens,
+    model.pat_str
+  );
+
   const body = await req.json();
-  const prompt = `
-    Generate a concise PR description from the provided git diff according to a provided template.
-    The PR description should be a good summary of the changes made.
-    Do not reference each file and function added but rather give a general explanation of the changes made.
-    Don't mention each change individually, but rather group them together.
-    You are free to make a calculated guess as to which changes and files are related to each other so you can group them together.
-    When endpoints/routes are in the diff try to reference these when describing features.
-    It's not worth mentioning that you added tests when you mention you added a new feature as it implies that you added tests in the first place.
-    If notes or reason why the change happened are requested, make sure you try to explain the reasoning without using too much technical jargon.
-    If a section has no content, you can leave the entire section out.
-    If the diff provided is not actually a diff I want you to respond with an appropriate message accordingly.
+  let prompt = generatePrompt(body.diff, body.template);
 
-    The PR description should be structured as follows: """
-    ${body.template}
-    """
+  // Check if exceeding model max token length and minify accordingly
+  if (encoding.encode(prompt).length > 4096) {
+    prompt = generatePrompt(body.diff, body.template, true);
 
-    Here is the diff: """
-    ${prepareDiff(body.diff)}
-    """
-  `;
+    // Check if minified prompt is still too long
+    if (encoding.encode(prompt).length > 4096) {
+      throw new Error(
+        'The diff is too large, try reducing the number of staged changes.'
+      );
+    }
+  }
 
   const stream = await OpenAIStream({
     model: 'gpt-3.5-turbo',
@@ -44,6 +48,9 @@ export default async function handler(req: NextRequest) {
     stream: true,
     n: 1,
   });
+
+  // Free the encoding to prevent memory leaks
+  encoding.free();
 
   return new Response(stream);
 }
