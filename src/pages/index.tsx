@@ -108,6 +108,8 @@ export default function Home() {
             break;
           }
         }
+      } catch (err) {
+        // TODO: Handle error accordingly and show a message to the user
       } finally {
         setIsGenerating(false);
       }
