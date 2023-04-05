@@ -2,7 +2,7 @@ import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
   const description =
-    'Why wait until GitHub Copilot X is here? Generate proper PR descriptions now!';
+    'Why wait until GitHub Copilot X is here? Generate proper PR descriptions now using AI!';
 
   return (
     <Html lang="en">
