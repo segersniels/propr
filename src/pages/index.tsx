@@ -4,6 +4,7 @@ import {
   FormEvent,
   TextareaHTMLAttributes,
   useCallback,
+  useRef,
   useState,
 } from 'react';
 import styles from 'styles/Home.module.css';
@@ -72,6 +73,13 @@ export default function Home() {
   const [template, setTemplate] = useState('');
   const [message, setMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const ref = useRef<null | HTMLDivElement>(null);
+
+  const scrollIntoView = () => {
+    if (ref.current !== null) {
+      ref.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const handleSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -112,6 +120,7 @@ export default function Home() {
         // TODO: Handle error accordingly and show a message to the user
       } finally {
         setIsGenerating(false);
+        scrollIntoView();
       }
     },
     [diff, template]
@@ -160,6 +169,7 @@ export default function Home() {
             <hr className="my-4 w-64 mx-auto" />
 
             <div
+              ref={ref}
               className={styles.message}
               onClick={() => {
                 return navigator.clipboard.writeText(message);
