@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { OpenAIStream } from 'helpers/Stream';
-import { generatePrompt } from 'helpers/Prompt';
+import * as PromptHelper from 'helpers/Prompt';
 // @ts-expect-error
 import wasm from 'resources/tiktoken_bg.wasm?module';
 import model from '@dqbd/tiktoken/encoders/cl100k_base.json';
@@ -23,38 +23,70 @@ export default async function handler(req: NextRequest) {
   );
 
   const body = await req.json();
-  let prompt = generatePrompt(body.diff, body.template);
+  const prompt = PromptHelper.generatePrompt(body.diff, body.template);
 
-  // Check if exceeding model max token length and minify accordingly
-  if (encoding.encode(prompt).length > 4096) {
-    prompt = generatePrompt(body.diff, body.template, true);
+  // Within model token length so pass entire diff
+  if (encoding.encode(prompt).length < 4096) {
+    const stream = await OpenAIStream(PromptHelper.createPayload(prompt, true));
 
-    // Check if minified prompt is still too long
-    if (encoding.encode(prompt).length > 4096) {
-      return new Response(
-        `The diff is too large (${
-          encoding.encode(prompt).length
-        }), try reducing the number of staged changes.`,
-        {
-          status: 400,
-        }
-      );
-    }
+    encoding.free();
+
+    return new Response(stream);
   }
 
-  const stream = await OpenAIStream({
-    model: 'gpt-3.5-turbo',
-    messages: [{ role: 'user', content: prompt }],
-    temperature: 0.7,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0,
-    max_tokens: 300,
-    stream: true,
-    n: 1,
-  });
+  // Split diff into chunks and generate prompts for each chunk
+  const descriptions = await Promise.all(
+    PromptHelper.split(body.diff).map(async (chunk) => {
+      let chunkPrompt = PromptHelper.generatePrompt(chunk, body.template);
 
-  // Free the encoding to prevent memory leaks
+      if (encoding.encode(chunkPrompt).length > 4096) {
+        chunkPrompt = PromptHelper.generatePrompt(chunk, body.template, true);
+
+        // Check if minified prompt is still too long
+        if (encoding.encode(chunkPrompt).length > 4096) {
+          return new Response(
+            `The diff is too large (${
+              encoding.encode(chunkPrompt).length
+            }), try reducing the number of staged changes.`,
+            {
+              status: 400,
+            }
+          );
+        }
+      }
+
+      const response = await fetch(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ''}`,
+          },
+          method: 'POST',
+          body: JSON.stringify(PromptHelper.createPayload(chunkPrompt, false)),
+        }
+      );
+
+      if (!response.ok) {
+        return new Response(await response.text(), {
+          status: 500,
+        });
+      }
+
+      const data = await response.json();
+
+      return data.choices[0].message.content;
+    })
+  );
+
+  // Ask ChatGPT to consolidate into one description
+  const stream = await OpenAIStream(
+    PromptHelper.createPayload(
+      PromptHelper.generateConsolidatePrompt(descriptions, body.template),
+      true
+    )
+  );
+
   encoding.free();
 
   return new Response(stream);
