@@ -1,4 +1,5 @@
 import { OpenAIStreamPayload } from './Stream';
+import { Tiktoken } from '@dqbd/tiktoken/lite/init';
 
 const FILES_TO_IGNORE = [
   'package-lock.json',
@@ -86,11 +87,38 @@ export function generateConsolidatePrompt(
 /**
  * Split the large diff into separate chunks
  */
-export function split(diff: string) {
-  return Array.from(
+export function split(diff: string, encoding: Tiktoken) {
+  const combinedChunks = [];
+
+  // Split into smaller chunks
+  const chunks = Array.from(
     diff.matchAll(/diff --git[\s\S]*?(?=diff --git|$)/g),
     (match) => match[0]
   );
+
+  /**
+   * Add chunks together as long as they do not exceed token length
+   * to limit the number of requests we do to the OpenAI API
+   */
+  let currentChunk = '';
+  for (const chunk of chunks) {
+    const currentChunkLength = encoding.encode(currentChunk).length;
+    const chunkLength = encoding.encode(chunk).length;
+
+    if (currentChunkLength + chunkLength <= 4096) {
+      currentChunk += chunk;
+    } else {
+      combinedChunks.push(currentChunk);
+      currentChunk = chunk;
+    }
+  }
+
+  // Add any remaining chunk to the array
+  if (currentChunk) {
+    combinedChunks.push(currentChunk);
+  }
+
+  return combinedChunks;
 }
 
 /**
