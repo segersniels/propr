@@ -47,22 +47,18 @@ export default async function handler(req: NextRequest) {
   // Split diff into chunks and generate prompts for each chunk
   const descriptions = await Promise.all(
     PromptHelper.split(body.diff, encoding).map(async (chunk) => {
-      let chunkPrompt = PromptHelper.generatePrompt(chunk, body.template);
+      let chunkPrompt = PromptHelper.generatePrompt(chunk, body.template, true);
 
+      // Check if minified prompt is still too long
       if (encoding.encode(chunkPrompt).length > 4096) {
-        chunkPrompt = PromptHelper.generatePrompt(chunk, body.template, true);
-
-        // Check if minified prompt is still too long
-        if (encoding.encode(chunkPrompt).length > 4096) {
-          return new Response(
-            `The diff is too large (${
-              encoding.encode(chunkPrompt).length
-            }), try reducing the number of staged changes.`,
-            {
-              status: 400,
-            }
-          );
-        }
+        return new Response(
+          `The diff is too large (${
+            encoding.encode(chunkPrompt).length
+          }), try reducing the number of staged changes.`,
+          {
+            status: 400,
+          }
+        );
       }
 
       const response = await fetch(

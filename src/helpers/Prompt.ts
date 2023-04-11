@@ -85,10 +85,25 @@ export function generateConsolidatePrompt(
 }
 
 /**
+ * Get token length of default prompt excluding the diff or template
+ */
+function getDefaultPromptTokenLength(encoding: Tiktoken) {
+  return encoding.encode(generatePrompt('', '')).length;
+}
+
+/**
+ * Get max token length of model excluding the default prompt
+ */
+function getMaxTokenLength(encoding: Tiktoken) {
+  return 4096 - getDefaultPromptTokenLength(encoding);
+}
+
+/**
  * Split the large diff into separate chunks
  */
 export function split(diff: string, encoding: Tiktoken) {
   const combinedChunks = [];
+  const maxTokenLength = getMaxTokenLength(encoding);
 
   // Split into smaller chunks
   const chunks = Array.from(
@@ -105,7 +120,7 @@ export function split(diff: string, encoding: Tiktoken) {
     const currentChunkLength = encoding.encode(currentChunk).length;
     const chunkLength = encoding.encode(chunk).length;
 
-    if (currentChunkLength + chunkLength <= 4096) {
+    if (currentChunkLength + chunkLength <= maxTokenLength) {
       currentChunk += chunk;
     } else {
       combinedChunks.push(currentChunk);
