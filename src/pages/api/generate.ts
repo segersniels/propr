@@ -47,7 +47,7 @@ export default async function handler(req: NextRequest) {
   // Split diff into chunks and generate prompts for each chunk
   const descriptions = await Promise.all(
     PromptHelper.split(body.diff, encoding).map(async (chunk) => {
-      let chunkPrompt = PromptHelper.generatePrompt(chunk, body.template, true);
+      let chunkPrompt = PromptHelper.generatePrompt(chunk, body.template);
 
       // Check if minified prompt is still too long
       if (encoding.encode(chunkPrompt).length > 4096) {
