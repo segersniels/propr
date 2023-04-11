@@ -23,9 +23,19 @@ export default async function handler(req: NextRequest) {
   );
 
   const body = await req.json();
-  const prompt = PromptHelper.generatePrompt(body.diff, body.template);
 
   // Within model token length so pass entire diff
+  let prompt = PromptHelper.generatePrompt(body.diff, body.template);
+  if (encoding.encode(prompt).length < 4096) {
+    const stream = await OpenAIStream(PromptHelper.createPayload(prompt, true));
+
+    encoding.free();
+
+    return new Response(stream);
+  }
+
+  // Check whether the minified body is within model token length
+  prompt = PromptHelper.generatePrompt(body.diff, body.template, true);
   if (encoding.encode(prompt).length < 4096) {
     const stream = await OpenAIStream(PromptHelper.createPayload(prompt, true));
 
