@@ -8,6 +8,12 @@ const FILES_TO_IGNORE = [
   'yarn-debug.log',
   'yarn-error.log',
   '.pnpm-debug.log',
+  'Cargo.lock',
+  'Gemfile.lock',
+  'mix.lock',
+  'Pipfile.lock',
+  'composer.lock',
+  'glide.lock',
 ];
 
 /**
