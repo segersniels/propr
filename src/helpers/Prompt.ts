@@ -30,28 +30,35 @@ function removeExcessiveLinesFromChunk(diff: string, minify = false) {
     .join('\n');
 }
 
+function splitDiffIntoChunks(diff: string) {
+  return Array.from(
+    diff.matchAll(/diff --git[\s\S]*?(?=diff --git|$)/g),
+    (match) => match[0]
+  ).map((chunk) => chunk.replace(/ {2,}/g, ''));
+}
+
+function removeLockFiles(chunks: string[]) {
+  return chunks.filter((chunk) => {
+    const firstLine = chunk.split('\n')[0];
+
+    for (const file of FILES_TO_IGNORE) {
+      if (firstLine.includes(file)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}
+
 /**
  * Prepare a diff for use in the prompt by removing stuff like
  * the lockfile changes and removing some of the whitespace.
  */
 function prepareDiff(diff: string, minify = false) {
-  const chunks = Array.from(
-    diff.matchAll(/diff --git[\s\S]*?(?=diff --git|$)/g),
-    (match) => match[0]
-  ).map((chunk) => chunk.replace(/ {2,}/g, ''));
+  const chunks = splitDiffIntoChunks(diff);
 
-  return chunks
-    .filter((chunk) => {
-      const firstLine = chunk.split('\n')[0];
-
-      for (const file of FILES_TO_IGNORE) {
-        if (firstLine.includes(file)) {
-          return false;
-        }
-      }
-
-      return true;
-    })
+  return removeLockFiles(chunks)
     .map((chunk) => removeExcessiveLinesFromChunk(chunk, minify))
     .join('\n');
 }
@@ -112,10 +119,10 @@ export function split(diff: string, template: string, encoding: Tiktoken) {
   const maxTokenLength = getMaxTokenLength(template, encoding);
 
   // Split into smaller chunks
-  const chunks = Array.from(
-    diff.matchAll(/diff --git[\s\S]*?(?=diff --git|$)/g),
-    (match) => match[0]
-  );
+  let chunks = splitDiffIntoChunks(diff);
+
+  // Filter out lockfiles
+  chunks = removeLockFiles(chunks);
 
   /**
    * Add chunks together as long as they do not exceed token length
