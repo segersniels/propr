@@ -1,8 +1,7 @@
-import { OpenAIStreamPayload } from './Stream';
+import { MAX_RESPONSE_LENGTH } from './OpenAI';
 import { Tiktoken } from '@dqbd/tiktoken/lite/init';
 
 export const MODEL_TOKEN_LENGTH = 4097;
-const MAX_RESPONSE_LENGTH = 500;
 const FILES_TO_IGNORE = [
   'package-lock.json',
   'yarn.lock',
@@ -170,24 +169,4 @@ export function split(diff: string, template: string, encoding: Tiktoken) {
   }
 
   return combinedChunks;
-}
-
-/**
- * Create payload to be sent to OpenAI API
- */
-export function createPayload(
-  content: string,
-  stream = false
-): OpenAIStreamPayload {
-  return {
-    model: 'gpt-3.5-turbo',
-    messages: [{ role: 'user', content }],
-    temperature: 0.7,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0,
-    max_tokens: MAX_RESPONSE_LENGTH,
-    stream,
-    n: 1,
-  };
 }

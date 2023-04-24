@@ -23,7 +23,29 @@ export interface OpenAIStreamPayload {
   n: number;
 }
 
-export async function OpenAIStream(payload: OpenAIStreamPayload) {
+/**
+ * Create payload to be sent to OpenAI API
+ */
+export function createPayload(
+  content: string,
+  stream = false
+): OpenAIStreamPayload {
+  return {
+    model: 'gpt-3.5-turbo',
+    messages: [{ role: 'user', content }],
+    temperature: 0.7,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+    max_tokens: MAX_RESPONSE_LENGTH,
+    stream,
+    n: 1,
+  };
+}
+
+export const MAX_RESPONSE_LENGTH = 500;
+
+export async function createOpenAIStream(payload: OpenAIStreamPayload) {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
