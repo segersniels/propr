@@ -23,10 +23,13 @@ export default async function handler(req: NextRequest) {
   );
 
   const body = await req.json();
+  const maxTokenLength = PromptHelper.getMaxTokenLength({
+    encoding,
+  });
 
   // Within model token length so pass entire diff
   let prompt = PromptHelper.generatePrompt(body.diff, body.template);
-  if (encoding.encode(prompt).length < 4096) {
+  if (encoding.encode(prompt).length < maxTokenLength) {
     const stream = await OpenAIStream(PromptHelper.createPayload(prompt, true));
 
     encoding.free();
@@ -36,7 +39,7 @@ export default async function handler(req: NextRequest) {
 
   // Check whether the minified body is within model token length
   prompt = PromptHelper.generatePrompt(body.diff, body.template, true);
-  if (encoding.encode(prompt).length < 4096) {
+  if (encoding.encode(prompt).length < maxTokenLength) {
     const stream = await OpenAIStream(PromptHelper.createPayload(prompt, true));
 
     encoding.free();
@@ -46,43 +49,47 @@ export default async function handler(req: NextRequest) {
 
   // Split diff into chunks and generate prompts for each chunk
   const descriptions = await Promise.all(
-    PromptHelper.split(body.diff, body.template, encoding).map(async (chunk) => {
-      let chunkPrompt = PromptHelper.generatePrompt(chunk, body.template);
+    PromptHelper.split(body.diff, body.template, encoding).map(
+      async (chunk) => {
+        let chunkPrompt = PromptHelper.generatePrompt(chunk, body.template);
 
-      // Check if minified prompt is still too long
-      if (encoding.encode(chunkPrompt).length > 4096) {
-        return new Response(
-          `The diff is too large (${
-            encoding.encode(chunkPrompt).length
-          }), try reducing the number of staged changes.`,
+        // Check if minified prompt is still too long
+        if (encoding.encode(chunkPrompt).length > maxTokenLength) {
+          return new Response(
+            `The diff is too large (${
+              encoding.encode(chunkPrompt).length
+            }), try reducing the number of staged changes.`,
+            {
+              status: 400,
+            }
+          );
+        }
+
+        const response = await fetch(
+          'https://api.openai.com/v1/chat/completions',
           {
-            status: 400,
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ''}`,
+            },
+            method: 'POST',
+            body: JSON.stringify(
+              PromptHelper.createPayload(chunkPrompt, false)
+            ),
           }
         );
-      }
 
-      const response = await fetch(
-        'https://api.openai.com/v1/chat/completions',
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ''}`,
-          },
-          method: 'POST',
-          body: JSON.stringify(PromptHelper.createPayload(chunkPrompt, false)),
+        if (!response.ok) {
+          return new Response(await response.text(), {
+            status: 500,
+          });
         }
-      );
 
-      if (!response.ok) {
-        return new Response(await response.text(), {
-          status: 500,
-        });
+        const data = await response.json();
+
+        return data.choices[0].message.content;
       }
-
-      const data = await response.json();
-
-      return data.choices[0].message.content;
-    })
+    )
   );
 
   // Ask ChatGPT to consolidate into one description

@@ -1,6 +1,8 @@
 import { OpenAIStreamPayload } from './Stream';
 import { Tiktoken } from '@dqbd/tiktoken/lite/init';
 
+export const MODEL_TOKEN_LENGTH = 4097;
+const MAX_RESPONSE_LENGTH = 500;
 const FILES_TO_IGNORE = [
   'package-lock.json',
   'yarn.lock',
@@ -104,11 +106,28 @@ function getDefaultPromptTokenLength(template: string, encoding: Tiktoken) {
   return encoding.encode(generatePrompt('', template)).length;
 }
 
+type GetMaxTokenLengthOptions = {
+  encoding: Tiktoken;
+} & (
+  | {
+      template: string;
+      excludePrompt: true;
+    }
+  | {
+      excludePrompt?: false;
+      template?: undefined;
+    }
+);
+
 /**
- * Get max token length of model excluding the default prompt
+ * Get max token length of model
  */
-function getMaxTokenLength(template: string, encoding: Tiktoken) {
-  return 4096 - getDefaultPromptTokenLength(template, encoding);
+export function getMaxTokenLength(options: GetMaxTokenLengthOptions) {
+  const promptLength = options.excludePrompt
+    ? getDefaultPromptTokenLength(options.template, options.encoding)
+    : 0;
+
+  return MODEL_TOKEN_LENGTH - MAX_RESPONSE_LENGTH - promptLength;
 }
 
 /**
@@ -116,7 +135,11 @@ function getMaxTokenLength(template: string, encoding: Tiktoken) {
  */
 export function split(diff: string, template: string, encoding: Tiktoken) {
   const combinedChunks = [];
-  const maxTokenLength = getMaxTokenLength(template, encoding);
+  const maxTokenLength = getMaxTokenLength({
+    encoding,
+    template,
+    excludePrompt: true,
+  });
 
   // Split into smaller chunks
   let chunks = splitDiffIntoChunks(diff);
@@ -163,7 +186,7 @@ export function createPayload(
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,
-    max_tokens: 500,
+    max_tokens: MAX_RESPONSE_LENGTH,
     stream,
     n: 1,
   };
