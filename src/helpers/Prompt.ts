@@ -1,7 +1,7 @@
 import { MAX_RESPONSE_LENGTH } from './OpenAI';
 import { Tiktoken } from '@dqbd/tiktoken/lite/init';
 
-export const MODEL_TOKEN_LENGTH = 4097;
+export const MODEL_TOKEN_LENGTH = 8192;
 const FILES_TO_IGNORE = [
   'package-lock.json',
   'yarn.lock',
