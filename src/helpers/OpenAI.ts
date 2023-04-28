@@ -31,7 +31,7 @@ export function createPayload(
   stream = false
 ): OpenAIStreamPayload {
   return {
-    model: 'gpt-3.5-turbo',
+    model: 'gpt-4',
     messages: [{ role: 'user', content }],
     temperature: 0.7,
     top_p: 1,
