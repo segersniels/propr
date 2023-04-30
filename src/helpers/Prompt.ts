@@ -107,7 +107,7 @@ function getDefaultPromptTokenLength(template: string, encoding: Tiktoken) {
 }
 
 type GetMaxTokenLengthOptions = {
-  model: 'gpt-4' | 'gpt-3.5-turbo';
+  useOlderModel?: boolean;
   encoding: Tiktoken;
 } & (
   | {
@@ -124,8 +124,9 @@ type GetMaxTokenLengthOptions = {
  * Get max token length of model
  */
 export function getMaxTokenLength(options: GetMaxTokenLengthOptions) {
-  const tokenLength =
-    options.model === 'gpt-4' ? GPT4_TOKEN_LENGTH : GPT3_TOKEN_LENGTH;
+  const tokenLength = options.useOlderModel
+    ? GPT3_TOKEN_LENGTH
+    : GPT4_TOKEN_LENGTH;
   const promptLength = options.excludePrompt
     ? getDefaultPromptTokenLength(options.template, options.encoding)
     : 0;
@@ -137,7 +138,7 @@ interface SplitOptions {
   diff: string;
   template: string;
   encoding: Tiktoken;
-  model: 'gpt-4' | 'gpt-3.5-turbo';
+  useOlderModel: boolean;
 }
 
 /**

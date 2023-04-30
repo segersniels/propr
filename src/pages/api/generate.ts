@@ -23,7 +23,7 @@ async function consolidateUsingChunks(
   template: string
 ) {
   const maxTokenLength = PromptHelper.getMaxTokenLength({
-    model: 'gpt-3.5-turbo',
+    useOlderModel: true,
     encoding,
   });
 
@@ -32,7 +32,7 @@ async function consolidateUsingChunks(
       diff,
       template,
       encoding,
-      model: 'gpt-3.5-turbo',
+      useOlderModel: true,
     }).map(async (chunk) => {
       let chunkPrompt = PromptHelper.generatePrompt(chunk, template);
 
@@ -57,7 +57,7 @@ async function consolidateUsingChunks(
           },
           method: 'POST',
           body: JSON.stringify(
-            OpenAIHelper.createPayload(chunkPrompt, 'gpt-3.5-turbo', false)
+            OpenAIHelper.createPayload(chunkPrompt, false, true)
           ),
         }
       );
@@ -85,7 +85,6 @@ export default async function handler(req: NextRequest) {
 
   const body = await req.json();
   let maxTokenLength = PromptHelper.getMaxTokenLength({
-    model: 'gpt-4',
     encoding,
   });
 
@@ -93,7 +92,7 @@ export default async function handler(req: NextRequest) {
   let prompt = PromptHelper.generatePrompt(body.diff, body.template);
   if (encoding.encode(prompt).length < maxTokenLength) {
     const stream = await OpenAIHelper.createOpenAIStream(
-      OpenAIHelper.createPayload(prompt, 'gpt-4', true)
+      OpenAIHelper.createPayload(prompt, true)
     );
 
     encoding.free();
@@ -105,7 +104,7 @@ export default async function handler(req: NextRequest) {
   prompt = PromptHelper.generatePrompt(body.diff, body.template, true);
   if (encoding.encode(prompt).length < maxTokenLength) {
     const stream = await OpenAIHelper.createOpenAIStream(
-      OpenAIHelper.createPayload(prompt, 'gpt-4', true)
+      OpenAIHelper.createPayload(prompt, true)
     );
 
     encoding.free();
@@ -123,7 +122,7 @@ export default async function handler(req: NextRequest) {
   const stream = await OpenAIHelper.createOpenAIStream(
     OpenAIHelper.createPayload(
       PromptHelper.generateConsolidatePrompt(descriptions, body.template),
-      'gpt-3.5-turbo',
+      true,
       true
     )
   );

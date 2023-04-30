@@ -28,11 +28,11 @@ export interface OpenAIStreamPayload {
  */
 export function createPayload(
   content: string,
-  model: 'gpt-4' | 'gpt-3.5-turbo',
-  stream = false
+  stream = false,
+  useOlderModel = false,
 ): OpenAIStreamPayload {
   return {
-    model,
+    model: useOlderModel ? 'gpt-3.5-turbo' : 'gpt-4',
     messages: [{ role: 'user', content }],
     temperature: 0.7,
     top_p: 1,
