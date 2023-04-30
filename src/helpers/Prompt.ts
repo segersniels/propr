@@ -1,7 +1,8 @@
 import { MAX_RESPONSE_LENGTH } from './OpenAI';
 import { Tiktoken } from '@dqbd/tiktoken/lite/init';
 
-export const MODEL_TOKEN_LENGTH = 8192;
+const GPT4_TOKEN_LENGTH = 8192;
+const GPT3_TOKEN_LENGTH = 4096;
 const FILES_TO_IGNORE = [
   'package-lock.json',
   'yarn.lock',
@@ -106,6 +107,7 @@ function getDefaultPromptTokenLength(template: string, encoding: Tiktoken) {
 }
 
 type GetMaxTokenLengthOptions = {
+  model: 'gpt-4' | 'gpt-3.5-turbo';
   encoding: Tiktoken;
 } & (
   | {
@@ -122,26 +124,34 @@ type GetMaxTokenLengthOptions = {
  * Get max token length of model
  */
 export function getMaxTokenLength(options: GetMaxTokenLengthOptions) {
+  const tokenLength =
+    options.model === 'gpt-4' ? GPT4_TOKEN_LENGTH : GPT3_TOKEN_LENGTH;
   const promptLength = options.excludePrompt
     ? getDefaultPromptTokenLength(options.template, options.encoding)
     : 0;
 
-  return MODEL_TOKEN_LENGTH - MAX_RESPONSE_LENGTH - promptLength;
+  return tokenLength - MAX_RESPONSE_LENGTH - promptLength;
+}
+
+interface SplitOptions {
+  diff: string;
+  template: string;
+  encoding: Tiktoken;
+  model: 'gpt-4' | 'gpt-3.5-turbo';
 }
 
 /**
  * Split the large diff into separate chunks
  */
-export function split(diff: string, template: string, encoding: Tiktoken) {
+export function split(options: SplitOptions) {
   const combinedChunks = [];
   const maxTokenLength = getMaxTokenLength({
-    encoding,
-    template,
+    ...options,
     excludePrompt: true,
   });
 
   // Split into smaller chunks
-  let chunks = splitDiffIntoChunks(diff);
+  let chunks = splitDiffIntoChunks(options.diff);
 
   // Filter out lockfiles
   chunks = removeLockFiles(chunks);
@@ -152,8 +162,8 @@ export function split(diff: string, template: string, encoding: Tiktoken) {
    */
   let currentChunk = '';
   for (const chunk of chunks) {
-    const currentChunkLength = encoding.encode(currentChunk).length;
-    const chunkLength = encoding.encode(chunk).length;
+    const currentChunkLength = options.encoding.encode(currentChunk).length;
+    const chunkLength = options.encoding.encode(chunk).length;
 
     if (currentChunkLength + chunkLength <= maxTokenLength) {
       currentChunk += chunk;

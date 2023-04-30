@@ -23,11 +23,17 @@ async function consolidateUsingChunks(
   template: string
 ) {
   const maxTokenLength = PromptHelper.getMaxTokenLength({
+    model: 'gpt-3.5-turbo',
     encoding,
   });
 
   return await Promise.all(
-    PromptHelper.split(diff, template, encoding).map(async (chunk) => {
+    PromptHelper.split({
+      diff,
+      template,
+      encoding,
+      model: 'gpt-3.5-turbo',
+    }).map(async (chunk) => {
       let chunkPrompt = PromptHelper.generatePrompt(chunk, template);
 
       // Check if minified prompt is still too long
@@ -50,7 +56,9 @@ async function consolidateUsingChunks(
             Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ''}`,
           },
           method: 'POST',
-          body: JSON.stringify(OpenAIHelper.createPayload(chunkPrompt, false)),
+          body: JSON.stringify(
+            OpenAIHelper.createPayload(chunkPrompt, 'gpt-3.5-turbo', false)
+          ),
         }
       );
 
@@ -76,7 +84,8 @@ export default async function handler(req: NextRequest) {
   );
 
   const body = await req.json();
-  const maxTokenLength = PromptHelper.getMaxTokenLength({
+  let maxTokenLength = PromptHelper.getMaxTokenLength({
+    model: 'gpt-4',
     encoding,
   });
 
@@ -84,7 +93,7 @@ export default async function handler(req: NextRequest) {
   let prompt = PromptHelper.generatePrompt(body.diff, body.template);
   if (encoding.encode(prompt).length < maxTokenLength) {
     const stream = await OpenAIHelper.createOpenAIStream(
-      OpenAIHelper.createPayload(prompt, true)
+      OpenAIHelper.createPayload(prompt, 'gpt-4', true)
     );
 
     encoding.free();
@@ -96,7 +105,7 @@ export default async function handler(req: NextRequest) {
   prompt = PromptHelper.generatePrompt(body.diff, body.template, true);
   if (encoding.encode(prompt).length < maxTokenLength) {
     const stream = await OpenAIHelper.createOpenAIStream(
-      OpenAIHelper.createPayload(prompt, true)
+      OpenAIHelper.createPayload(prompt, 'gpt-4', true)
     );
 
     encoding.free();
@@ -114,6 +123,7 @@ export default async function handler(req: NextRequest) {
   const stream = await OpenAIHelper.createOpenAIStream(
     OpenAIHelper.createPayload(
       PromptHelper.generateConsolidatePrompt(descriptions, body.template),
+      'gpt-3.5-turbo',
       true
     )
   );
