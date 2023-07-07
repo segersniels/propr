@@ -22,6 +22,7 @@ export interface OpenAIStreamPayload {
   max_tokens: number;
   stream: boolean;
   n: number;
+  user?: string;
 }
 
 /**
@@ -32,8 +33,9 @@ export function createPayload(
   stream = false
 ): OpenAIStreamPayload {
   return {
+    user: 'propr.dev',
     model: 'gpt-3.5-turbo-16k',
-    messages: [{ role: 'user', content, name: 'propr' }],
+    messages: [{ role: 'user', content }],
     temperature: 0.7,
     top_p: 1,
     frequency_penalty: 0,
