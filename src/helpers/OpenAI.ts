@@ -9,6 +9,7 @@ export type ChatGPTAgent = 'user' | 'system';
 export interface ChatGPTMessage {
   role: ChatGPTAgent;
   content: string;
+  name?: string;
 }
 
 export interface OpenAIStreamPayload {
@@ -28,12 +29,11 @@ export interface OpenAIStreamPayload {
  */
 export function createPayload(
   content: string,
-  stream = false,
-  useOlderModel = false,
+  stream = false
 ): OpenAIStreamPayload {
   return {
-    model: useOlderModel ? 'gpt-3.5-turbo' : 'gpt-4',
-    messages: [{ role: 'user', content }],
+    model: 'gpt-3.5-turbo-16k',
+    messages: [{ role: 'user', content, name: 'propr' }],
     temperature: 0.7,
     top_p: 1,
     frequency_penalty: 0,

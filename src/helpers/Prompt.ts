@@ -1,8 +1,7 @@
 import { MAX_RESPONSE_LENGTH } from './OpenAI';
 import { Tiktoken } from '@dqbd/tiktoken/lite/init';
 
-const GPT4_TOKEN_LENGTH = 8192;
-const GPT3_TOKEN_LENGTH = 4096;
+const TOKEN_LENGTH = 16_384;
 const FILES_TO_IGNORE = [
   'package-lock.json',
   'yarn.lock',
@@ -107,7 +106,6 @@ function getDefaultPromptTokenLength(template: string, encoding: Tiktoken) {
 }
 
 type GetMaxTokenLengthOptions = {
-  useOlderModel?: boolean;
   encoding: Tiktoken;
 } & (
   | {
@@ -124,21 +122,17 @@ type GetMaxTokenLengthOptions = {
  * Get max token length of model
  */
 export function getMaxTokenLength(options: GetMaxTokenLengthOptions) {
-  const tokenLength = options.useOlderModel
-    ? GPT3_TOKEN_LENGTH
-    : GPT4_TOKEN_LENGTH;
   const promptLength = options.excludePrompt
     ? getDefaultPromptTokenLength(options.template, options.encoding)
     : 0;
 
-  return tokenLength - MAX_RESPONSE_LENGTH - promptLength;
+  return TOKEN_LENGTH - MAX_RESPONSE_LENGTH - promptLength;
 }
 
 interface SplitOptions {
   diff: string;
   template: string;
   encoding: Tiktoken;
-  useOlderModel: boolean;
 }
 
 /**

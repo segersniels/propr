@@ -23,7 +23,6 @@ async function consolidateUsingChunks(
   template: string
 ) {
   const maxTokenLength = PromptHelper.getMaxTokenLength({
-    useOlderModel: true,
     encoding,
   });
 
@@ -32,7 +31,6 @@ async function consolidateUsingChunks(
       diff,
       template,
       encoding,
-      useOlderModel: true,
     }).map(async (chunk) => {
       let chunkPrompt = PromptHelper.generatePrompt(chunk, template);
 
@@ -56,9 +54,7 @@ async function consolidateUsingChunks(
             Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ''}`,
           },
           method: 'POST',
-          body: JSON.stringify(
-            OpenAIHelper.createPayload(chunkPrompt, false, true)
-          ),
+          body: JSON.stringify(OpenAIHelper.createPayload(chunkPrompt, false)),
         }
       );
 
@@ -122,7 +118,6 @@ export default async function handler(req: NextRequest) {
   const stream = await OpenAIHelper.createOpenAIStream(
     OpenAIHelper.createPayload(
       PromptHelper.generateConsolidatePrompt(descriptions, body.template),
-      true,
       true
     )
   );
