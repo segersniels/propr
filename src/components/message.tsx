@@ -11,7 +11,7 @@ export default function Message(props: Props) {
 
   return (
     <div
-      className="cursor-copy flex flex-col p-4 pl-6 shadow-md rounded-2xl border border-gray-100 hover:bg-gray-50"
+      className="cursor-copy flex flex-col p-4 pl-6 shadow-md rounded-md border border-gray-100 hover:bg-gray-50"
       onClick={() => {
         return navigator.clipboard.writeText(message);
       }}
