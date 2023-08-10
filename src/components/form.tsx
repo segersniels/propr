@@ -56,9 +56,8 @@ export default function Form() {
     lastMessage?.role === 'assistant' ? lastMessage.content : null;
 
   return (
-    <div>
+    <div className="flex flex-col w-full">
       <form
-        className="flex flex-col w-full"
         onSubmit={(e) => {
           handleSubmit(e);
           scrollIntoView();
@@ -95,7 +94,7 @@ export default function Form() {
           rows={4}
         />
 
-        <Button className="my-2 w-full" disabled={!diff.length}>
+        <Button className="w-full" disabled={!diff.length}>
           {isLoading ? (
             <AiOutlineLoading className="mx-2 animate-spin stroke-[3rem] font-bold" />
           ) : (
