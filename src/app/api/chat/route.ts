@@ -6,8 +6,9 @@ export const runtime = 'edge';
 function generateSystemMessage(template: string) {
   return `You will be asked to write a descriptive GitHub PR description based on a provided git diff.
     Analyze the code changes and provide a concise explanation of the changes, their context and why they were made.
-    Don't reference file names directly, instead focus on explaining the changes in a broader context.
+    Don't reference file names directly, instead give a general explanation of the changes made.
     Do not treat imports and requires as changes or new features.
+    The PR description should be a good summary of the changes made.
 
     Use the following template to write your description:
     """
@@ -15,6 +16,7 @@ function generateSystemMessage(template: string) {
     """
 
     If a section from the template does not apply (no significant changes in that category), omit that section from your final output.
+    If the provided message is not a diff respond with an appropriate message.
   `;
 }
 
