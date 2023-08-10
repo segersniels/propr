@@ -1,6 +1,8 @@
 import { Markdown } from './markdown';
 import remarkGfm from 'remark-gfm';
 import { CodeBlock } from './ui/codeblock';
+import { Button } from './ui/button';
+import { AiOutlineCopy } from 'react-icons/ai';
 
 interface Props {
   message: string;
@@ -10,12 +12,18 @@ export default function Message(props: Props) {
   const { message } = props;
 
   return (
-    <div
-      className="cursor-copy flex flex-col p-4 pl-6 shadow-md rounded-md border border-gray-100 hover:bg-gray-50"
-      onClick={() => {
-        return navigator.clipboard.writeText(message);
-      }}
-    >
+    <div className="relative flex flex-col p-6 shadow-md rounded-md border border-gray-100">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-2 right-2 text-neutral-500"
+        onClick={() => {
+          return navigator.clipboard.writeText(message);
+        }}
+      >
+        <AiOutlineCopy className="w-4 h-4" />
+      </Button>
+
       <Markdown
         className="prose break-words dark:prose-invert font-light"
         remarkPlugins={[remarkGfm]}
