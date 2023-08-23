@@ -2,6 +2,7 @@ import './globals.css';
 
 import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
+import Footer from 'components/footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -37,6 +38,8 @@ export default function RootLayout({
         <main className="flex w-full min-h-screen items-center justify-center">
           {children}
         </main>
+
+        <Footer />
         <Analytics />
       </body>
     </html>
