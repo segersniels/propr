@@ -1,10 +1,8 @@
 import './globals.css';
 
-import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
 import Footer from 'components/footer';
-
-const inter = Inter({ subsets: ['latin'] });
+import { GeistMono, GeistSans } from 'geist/font';
 
 export const metadata = {
   title: 'Propr',
@@ -33,8 +31,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+    >
+      <body>
         <main className="flex w-full min-h-screen items-center justify-center">
           {children}
         </main>
