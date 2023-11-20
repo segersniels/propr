@@ -7,6 +7,7 @@ import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { AiOutlineLoading } from 'react-icons/ai';
 import Message from './message';
+import Warning from './warning';
 
 const DIFF_PLACEHOLDER = `diff --git a/.docker/cassandra/Dockerfile b/.docker/cassandra/Dockerfile
 new file mode 100644
@@ -30,7 +31,7 @@ export default function Form() {
   const [template, setTemplate] = useState('');
   const ref = useRef<null | HTMLDivElement>(null);
 
-  const { messages, setInput, handleSubmit, isLoading } = useChat({
+  const { messages, setInput, handleSubmit, isLoading, error } = useChat({
     body: {
       diff,
       template,
@@ -102,6 +103,12 @@ export default function Form() {
           )}
         </Button>
       </form>
+
+      {!!error && (
+        <Warning.FailedResponse className="my-4" variant="destructive">
+          {error.message}
+        </Warning.FailedResponse>
+      )}
 
       {!!message && (
         <>
