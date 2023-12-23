@@ -2,17 +2,63 @@ import { experimental_AssistantResponse } from 'ai';
 import OpenAI from 'openai';
 import { MessageContentText } from 'openai/resources/beta/threads/messages/messages';
 
+const FILES_TO_IGNORE = [
+  'package-lock.json',
+  'yarn.lock',
+  'npm-debug.log',
+  'yarn-debug.log',
+  'yarn-error.log',
+  '.pnpm-debug.log',
+  'Cargo.lock',
+  'Gemfile.lock',
+  'mix.lock',
+  'Pipfile.lock',
+  'composer.lock',
+  'glide.lock',
+];
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
 });
 
 export const runtime = 'edge';
 
+function splitDiffIntoChunks(diff: string) {
+  return Array.from(
+    diff.matchAll(/diff --git[\s\S]*?(?=diff --git|$)/g),
+    (match) => match[0]
+  ).map((chunk) => chunk.replace(/ {2,}/g, ''));
+}
+
+function removeLockFiles(chunks: string[]) {
+  return chunks.filter((chunk) => {
+    const firstLine = chunk.split('\n')[0];
+
+    for (const file of FILES_TO_IGNORE) {
+      if (firstLine.includes(file)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}
+
+/**
+ * Prepare a diff for use in the prompt by removing stuff like
+ * the lockfile changes and removing some of the whitespace.
+ */
+function prepareDiff(diff: string) {
+  const chunks = splitDiffIntoChunks(diff);
+
+  return removeLockFiles(chunks).join('\n');
+}
+
 function generateUserMessage(diff: string, template: string) {
   return `
     The diff:
     """
-    ${diff}
+    ${prepareDiff(diff)}
     """
 
     Use the following template to write your description:

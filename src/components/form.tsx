@@ -103,7 +103,9 @@ export default function Form() {
 
       {shouldShowError && (
         <Warning.FailedResponse className="my-4" variant="destructive">
-          {(error as any).toString()}
+          {'message' in (error as Error)
+            ? (error as Error).message
+            : (error as any).toString()}
         </Warning.FailedResponse>
       )}
 
