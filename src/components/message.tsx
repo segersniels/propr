@@ -1,5 +1,4 @@
 import { Markdown } from './markdown';
-import remarkGfm from 'remark-gfm';
 import { Button } from './ui/button';
 import { AiOutlineCopy } from 'react-icons/ai';
 
@@ -25,7 +24,6 @@ export default function Message(props: Props) {
 
       <Markdown
         className="prose break-words font-light"
-        remarkPlugins={[remarkGfm]}
         components={{
           p({ children }) {
             return <p className="mb-2 last:mb-0">{children}</p>;
