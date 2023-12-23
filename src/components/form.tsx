@@ -27,6 +27,12 @@ const TEMPLATE_PLACEHOLDER = `### Added
 ### Removed
 ### Fixed`;
 
+function stripMarkdown(message: string) {
+  const regex = /^```(.*?)(markdown|md)(.*?)```(?:\r\n|\n)/gm;
+
+  return regex.exec(message)?.[1] ?? message;
+}
+
 export default function Form() {
   const [shouldShowError, setShouldShowError] = useState(false);
   const [template, setTemplate] = useLocalStorage('template', '');
@@ -113,7 +119,7 @@ export default function Form() {
         <>
           <hr className="my-4 w-64 mx-auto" />
 
-          <Message message={message} />
+          <Message message={stripMarkdown(message)} />
         </>
       )}
     </div>
