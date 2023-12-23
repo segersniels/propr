@@ -1,6 +1,6 @@
 'use client';
 
-import { useChat } from 'ai/react';
+import { experimental_useAssistant as useAssistant } from 'ai/react';
 import { useEffect, useRef, useState } from 'react';
 import Step from './step';
 import { Textarea } from './ui/textarea';
@@ -8,6 +8,7 @@ import { Button } from './ui/button';
 import { AiOutlineLoading } from 'react-icons/ai';
 import Message from './message';
 import Warning from './warning';
+import useLocalStorage from 'hooks/use-local-storage';
 
 const DIFF_PLACEHOLDER = `diff --git a/.docker/cassandra/Dockerfile b/.docker/cassandra/Dockerfile
 new file mode 100644
@@ -27,24 +28,17 @@ const TEMPLATE_PLACEHOLDER = `### Added
 ### Fixed`;
 
 export default function Form() {
-  const [diff, setDiff] = useState('');
-  const [template, setTemplate] = useState('');
+  const [shouldShowError, setShouldShowError] = useState(false);
+  const [template, setTemplate] = useLocalStorage('template', '');
   const ref = useRef<null | HTMLDivElement>(null);
 
-  const { messages, setInput, handleSubmit, isLoading, error } = useChat({
-    body: {
-      diff,
-      template,
-    },
-  });
-
-  useEffect(() => {
-    if (!diff) {
-      return;
-    }
-
-    setInput(diff);
-  }, [diff, setInput]);
+  const { status, messages, input, submitMessage, handleInputChange, error } =
+    useAssistant({
+      api: '/api/assistant',
+      body: {
+        template,
+      },
+    });
 
   const scrollIntoView = () => {
     if (ref.current !== null) {
@@ -52,6 +46,15 @@ export default function Form() {
     }
   };
 
+  useEffect(() => {
+    if (!error) {
+      return setShouldShowError(false);
+    }
+
+    setShouldShowError(true);
+  }, [error]);
+
+  const isLoading = status === 'in_progress';
   const lastMessage = messages[messages.length - 1];
   const message =
     lastMessage?.role === 'assistant' ? lastMessage.content : null;
@@ -60,31 +63,11 @@ export default function Form() {
     <div className="flex flex-col w-full">
       <form
         onSubmit={(e) => {
-          handleSubmit(e);
+          submitMessage(e);
           scrollIntoView();
-
-          /**
-           * We reset the input to the original diff since the default behavior of `useChat`
-           * is to clear the input after submitting
-           */
-          setInput(diff);
         }}
       >
-        <Step step={1}>Navigate to your PR on GitHub</Step>
-        <Step step={2}>Add `.diff` to the end of the URL</Step>
-        <Step step={3}>Copy paste 🚀</Step>
-
-        <Textarea
-          className="min-h-[60px] w-full resize-none bg-transparent p-2 my-4 focus-within:outline-none sm:text-sm font-mono"
-          value={diff}
-          placeholder={DIFF_PLACEHOLDER}
-          onChange={(event) => setDiff(event.target.value)}
-          tabIndex={0}
-          rows={10}
-          spellCheck={false}
-        />
-
-        <Step step={4}>Provide a template</Step>
+        <Step step={1}>Provide a template</Step>
 
         <Textarea
           className="min-h-[60px] w-full resize-none bg-transparent p-2 my-4 focus-within:outline-none sm:text-sm font-mono"
@@ -95,7 +78,21 @@ export default function Form() {
           rows={4}
         />
 
-        <Button className="w-full" disabled={!diff.length}>
+        <Step step={2}>Navigate to your PR on GitHub</Step>
+        <Step step={3}>Add `.diff` to the end of the URL</Step>
+        <Step step={4}>Copy paste 🚀</Step>
+
+        <Textarea
+          className="min-h-[60px] w-full resize-none bg-transparent p-2 my-4 focus-within:outline-none sm:text-sm font-mono"
+          value={input}
+          placeholder={DIFF_PLACEHOLDER}
+          tabIndex={0}
+          rows={10}
+          spellCheck={false}
+          onChange={handleInputChange}
+        />
+
+        <Button className="w-full" disabled={!input.length}>
           {isLoading ? (
             <AiOutlineLoading className="mx-2 animate-spin stroke-[3rem] font-bold" />
           ) : (
@@ -104,9 +101,9 @@ export default function Form() {
         </Button>
       </form>
 
-      {!!error && (
+      {shouldShowError && (
         <Warning.FailedResponse className="my-4" variant="destructive">
-          {error.message}
+          {(error as any).toString()}
         </Warning.FailedResponse>
       )}
 
