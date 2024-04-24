@@ -46,6 +46,7 @@ func (p *Propr) Generate() (string, error) {
 	var description string
 	err = spinner.New().TitleStyle(lipgloss.NewStyle()).Title("Generating your pull request...").Action(func() {
 		if CONFIG.Data.Assistant.Enabled && CONFIG.Data.Assistant.Id != "" {
+			log.Debug("Using assistant completion")
 			response, err := p.client.GetAssistantCompletion(diff)
 			if err != nil {
 				log.Fatal(err)
@@ -53,6 +54,7 @@ func (p *Propr) Generate() (string, error) {
 
 			description = response
 		} else {
+			log.Debug("Using chat completion")
 			response, err := p.client.GetChatCompletion(diff)
 			if err != nil {
 				log.Fatal(err)
