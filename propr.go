@@ -45,7 +45,7 @@ func (p *Propr) Generate() (string, error) {
 
 	var description string
 	err = spinner.New().TitleStyle(lipgloss.NewStyle()).Title("Generating your pull request...").Action(func() {
-		if CONFIG.Data.Assistant.Enabled {
+		if CONFIG.Data.Assistant.Enabled && CONFIG.Data.Assistant.Id != "" {
 			response, err := p.client.GetAssistantCompletion(diff)
 			if err != nil {
 				log.Fatal(err)
