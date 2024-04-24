@@ -52,7 +52,7 @@ func printMarkdown(content string) error {
 		return err
 	}
 
-	fmt.Print(out)
+	println(out)
 	return nil
 }
 
