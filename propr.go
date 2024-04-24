@@ -33,7 +33,7 @@ func (p *Propr) Generate() (string, error) {
 		return "", err
 	}
 
-	log.Debug("Fetching diff", "branch", branch)
+	log.Debug("Fetching diff", "base", branch)
 	diff, err := getDiff(branch)
 	if err != nil {
 		return "", err
