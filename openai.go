@@ -123,6 +123,8 @@ func (o *OpenAI) GetChatCompletion(diff string) (string, error) {
 		return "", err
 	}
 
+	log.Debug("Run status", "usage", resp.Usage)
+
 	return resp.Choices[0].Message.Content, nil
 }
 
@@ -173,6 +175,8 @@ func (o *OpenAI) GetAssistantCompletion(diff string) (string, error) {
 			if len(messages.Messages) == 0 {
 				return "", fmt.Errorf("no messages found")
 			}
+
+			log.Debug("Run status", "usage", run.Usage)
 
 			return messages.Messages[0].Content[0].Text.Value, nil
 		}
