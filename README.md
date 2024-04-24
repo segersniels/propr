@@ -36,7 +36,6 @@ VERSION:
    x.x.x
 
 COMMANDS:
-   init      Initializes propr with a base configuration
    create    Creates a PR with a generated description
    generate  Generates a PR description and outputs it
    config    Configure propr to your liking
@@ -49,4 +48,4 @@ GLOBAL OPTIONS:
 
 ### Using an assistant
 
-You can configure `propr` to use a custom assistant using `propr init`. This may be interesting if you want to share prompts and templates between devices and/or want to control everything externally.
+You can configure `propr` to use a custom assistant using `propr config init`. This may be interesting if you want to share prompts and templates between devices and/or want to control everything externally.

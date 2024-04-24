@@ -69,38 +69,6 @@ func main() {
 		Version: AppVersion,
 		Commands: []*cli.Command{
 			{
-				Name:  "init",
-				Usage: "Initializes propr with a base configuration",
-				Action: func(ctx *cli.Context) error {
-					form := huh.NewForm(
-						huh.NewGroup(
-							huh.NewConfirm().Title("Assistant").Description("Do you want to use an OpenAI assistant to control your prompt?").Value(&CONFIG.Data.Assistant.Enabled),
-						),
-						huh.NewGroup(
-							huh.NewInput().Title("Assistant").Description("Provide the assistant's id").Value(&CONFIG.Data.Assistant.Id),
-						).WithHideFunc(func() bool {
-							return !CONFIG.Data.Assistant.Enabled
-						}),
-						huh.NewGroup(
-							huh.NewSelect[string]().Title("Model").Description("Configure the default model").Options(huh.NewOption(openai.GPT4TurboPreview, openai.GPT4TurboPreview), huh.NewOption(openai.GPT3Dot5Turbo, openai.GPT3Dot5Turbo)).Value(&CONFIG.Data.Model),
-							huh.NewText().Title("Prompt").Description("Configure the default prompt").CharLimit(99999).Value(&CONFIG.Data.Prompt),
-						).WithHideFunc(func() bool {
-							return CONFIG.Data.Assistant.Enabled
-						}),
-						huh.NewGroup(
-							huh.NewText().Title("Template").Description("Configure the default template").Value(&CONFIG.Data.Template),
-						),
-					)
-
-					err := form.Run()
-					if err != nil {
-						return err
-					}
-
-					return CONFIG.Save()
-				},
-			},
-			{
 				Name:  "create",
 				Usage: "Creates a PR with a generated description",
 				Action: func(ctx *cli.Context) error {
@@ -158,6 +126,38 @@ func main() {
 
 							fmt.Println(string(data))
 							return nil
+						},
+					},
+					{
+						Name:  "init",
+						Usage: "Initializes propr with a base configuration",
+						Action: func(ctx *cli.Context) error {
+							form := huh.NewForm(
+								huh.NewGroup(
+									huh.NewConfirm().Title("Assistant").Description("Do you want to use an OpenAI assistant to control your prompt?").Value(&CONFIG.Data.Assistant.Enabled),
+								),
+								huh.NewGroup(
+									huh.NewInput().Title("Assistant").Description("Provide the assistant's id").Value(&CONFIG.Data.Assistant.Id),
+								).WithHideFunc(func() bool {
+									return !CONFIG.Data.Assistant.Enabled
+								}),
+								huh.NewGroup(
+									huh.NewSelect[string]().Title("Model").Description("Configure the default model").Options(huh.NewOption(openai.GPT4TurboPreview, openai.GPT4TurboPreview), huh.NewOption(openai.GPT3Dot5Turbo, openai.GPT3Dot5Turbo)).Value(&CONFIG.Data.Model),
+									huh.NewText().Title("Prompt").Description("Configure the default prompt").CharLimit(99999).Value(&CONFIG.Data.Prompt),
+								).WithHideFunc(func() bool {
+									return CONFIG.Data.Assistant.Enabled
+								}),
+								huh.NewGroup(
+									huh.NewText().Title("Template").Description("Configure the default template").Value(&CONFIG.Data.Template),
+								),
+							)
+
+							err := form.Run()
+							if err != nil {
+								return err
+							}
+
+							return CONFIG.Save()
 						},
 					},
 				},
