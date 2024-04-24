@@ -39,7 +39,7 @@ BIN_NAME="propr-${os}-${arch}"
 DOWNLOAD_URL="${BASE_URL}/${BIN_NAME}"
 
 # Full path to the target binary
-FULL_PATH="${DEST_DIR}/${BIN_NAME}"
+FULL_PATH="${DEST_DIR}/propr"
 
 echo "Downloading ${BIN_NAME} to ${FULL_PATH}..."
 
