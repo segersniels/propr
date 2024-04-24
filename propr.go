@@ -33,7 +33,7 @@ func (p *Propr) Generate() (string, error) {
 		return "", err
 	}
 
-	log.Debug("fetching diff", "branch", branch)
+	log.Debug("Fetching diff", "branch", branch)
 	diff, err := getDiff(branch)
 	if err != nil {
 		return "", err
@@ -109,7 +109,7 @@ func (p *Propr) Create(description string) error {
 	if err != nil {
 		return err
 	} else if response.StatusCode != 201 {
-		log.Fatal("failed to create pull request", "error", response.Status)
+		log.Fatal("Failed to create pull request", "error", response.Status)
 	}
 
 	fmt.Printf("pull request created at %s\n", pr.GetHTMLURL())
