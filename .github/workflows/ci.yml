@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+concurrency:
+  group: github.ref
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.54
+
+  build:
+    needs: [lint]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - run: make build
+      - name: Get current package version
+        id: current_version
+        run: echo "version=$(make version)" >> $GITHUB_OUTPUT
+      - uses: mukunku/tag-exists-action@v1.4.0
+        id: check_tag
+        with:
+          tag: '${{ steps.current_version.outputs.version }}'
+      - uses: ncipollo/release-action@v1
+        if: steps.check_tag.outputs.exists == 'false'
+        with:
+          tag: '${{ steps.current_version.outputs.version }}'
+          artifacts: 'bin/*'
+          generateReleaseNotes: true
+          makeLatest: true
+          prerelease: false
+          replacesArtifacts: true
