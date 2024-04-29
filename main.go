@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/huh"
@@ -45,6 +46,11 @@ Don't surround your description in backticks but still write GitHub supported ma
 })
 
 func printMarkdown(content string, pretty bool) error {
+	// Remove leading and trailing backticks
+	if strings.HasPrefix(content, "```") {
+		content = strings.Trim(content, "`")
+	}
+
 	if !pretty {
 		println(content)
 		return nil
