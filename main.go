@@ -22,10 +22,11 @@ type AssistantConfig struct {
 }
 
 type Config struct {
-	Model     string          `json:"model"`
-	Prompt    string          `json:"prompt"`
-	Template  string          `json:"template"`
-	Assistant AssistantConfig `json:"assistant"`
+	Model       string          `json:"model"`
+	Prompt      string          `json:"prompt"`
+	Template    string          `json:"template"`
+	PrettyPrint bool            `json:"pretty_print"`
+	Assistant   AssistantConfig `json:"assistant"`
 }
 
 var CONFIG = config.NewConfig("propr", Config{
@@ -35,14 +36,20 @@ Analyze the code changes and provide a concise explanation of the changes, their
 Don't reference file names or directories directly, instead give a general explanation of the changes made.
 Do not treat imports and requires as changes or new features. If the provided message is not a diff respond with an appropriate message.
 Don't surround your description in backticks but still write GitHub supported markdown.`,
-	Template: "# Description",
+	Template:    "# Description",
+	PrettyPrint: true,
 	Assistant: AssistantConfig{
 		Enabled: false,
 		Id:      "",
 	},
 })
 
-func printMarkdown(content string) error {
+func printMarkdown(content string, pretty bool) error {
+	if !pretty {
+		println(content)
+		return nil
+	}
+
 	r, _ := glamour.NewTermRenderer(
 		glamour.WithAutoStyle(),
 	)
@@ -79,7 +86,7 @@ func main() {
 							log.Fatal(err)
 						}
 
-						err = printMarkdown(response)
+						err = printMarkdown(response, CONFIG.Data.PrettyPrint)
 						if err != nil {
 							log.Fatal(err)
 						}
@@ -108,7 +115,7 @@ func main() {
 						log.Fatal(err)
 					}
 
-					return printMarkdown(description)
+					return printMarkdown(description, CONFIG.Data.PrettyPrint)
 				},
 			},
 			{
@@ -142,7 +149,6 @@ func main() {
 								).WithHideFunc(func() bool {
 									return !CONFIG.Data.Assistant.Enabled
 								}),
-
 								huh.NewGroup(
 									huh.NewSelect[string]().Title("Model").Description("Configure the default model").Options(models...).Value(&CONFIG.Data.Model),
 									huh.NewText().Title("Prompt").Description("Configure the default prompt").CharLimit(99999).Value(&CONFIG.Data.Prompt),
@@ -151,6 +157,9 @@ func main() {
 								}),
 								huh.NewGroup(
 									huh.NewText().Title("Template").Description("Configure the default template").Value(&CONFIG.Data.Template),
+								),
+								huh.NewGroup(
+									huh.NewConfirm().Title("Pretty Print").Description("Do you want to pretty print the generated output?").Value(&CONFIG.Data.PrettyPrint),
 								),
 							)
 
