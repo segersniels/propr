@@ -114,7 +114,7 @@ func (p *Propr) Create(description string) error {
 		log.Fatal("Failed to create pull request", "error", response.Status)
 	}
 
-	fmt.Printf("pull request created at %s\n", pr.GetHTMLURL())
+	fmt.Printf("Pull request created at %s\n", pr.GetHTMLURL())
 
 	return nil
 }
