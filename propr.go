@@ -40,7 +40,7 @@ func (p *Propr) Generate() (string, error) {
 	}
 
 	if diff == "" {
-		return "", fmt.Errorf("no diff found")
+		return "", fmt.Errorf("not enough changes found to generate")
 	}
 
 	var description string
