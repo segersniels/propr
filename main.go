@@ -31,7 +31,7 @@ type Config struct {
 }
 
 var CONFIG = config.NewConfig("propr", Config{
-	Model: openai.GPT4TurboPreview,
+	Model: openai.GPT4Turbo,
 	Prompt: `You will be asked to write a concise GitHub PR description based on a provided git diff.
 Analyze the code changes and provide a concise explanation of the changes, their context and why they were made.
 Don't reference file names or directories directly, instead give a general explanation of the changes made.
