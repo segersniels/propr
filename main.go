@@ -115,13 +115,24 @@ func main() {
 			{
 				Name:  "generate",
 				Usage: "Generates a PR description and outputs it",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:  "plain",
+						Usage: "Output the generated description without any formatting",
+					},
+				},
 				Action: func(ctx *cli.Context) error {
 					description, err := propr.Generate()
 					if err != nil {
 						log.Fatal(err)
 					}
 
-					return printMarkdown(description, CONFIG.Data.PrettyPrint)
+					pretty := CONFIG.Data.PrettyPrint
+					if ctx.Bool("plain") {
+						pretty = false
+					}
+
+					return printMarkdown(description, pretty)
 				},
 			},
 			{
