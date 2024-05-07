@@ -84,10 +84,17 @@ func main() {
 			{
 				Name:  "create",
 				Usage: "Creates a PR with a generated description",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "branch",
+						Usage:       "The branch to compare your changes against",
+						DefaultText: "HEAD",
+					},
+				},
 				Action: func(ctx *cli.Context) error {
 					var description string
 					for {
-						response, err := propr.Generate()
+						response, err := propr.Generate(ctx.String("branch"))
 						if err != nil {
 							log.Fatal(err)
 						}
@@ -120,9 +127,14 @@ func main() {
 						Name:  "plain",
 						Usage: "Output the generated description without any formatting",
 					},
+					&cli.StringFlag{
+						Name:        "branch",
+						Usage:       "The branch to compare your changes against",
+						DefaultText: "HEAD",
+					},
 				},
 				Action: func(ctx *cli.Context) error {
-					description, err := propr.Generate()
+					description, err := propr.Generate(ctx.String("branch"))
 					if err != nil {
 						log.Fatal(err)
 					}

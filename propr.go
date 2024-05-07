@@ -27,10 +27,14 @@ func NewPropr() *Propr {
 	}
 }
 
-func (p *Propr) Generate() (string, error) {
-	branch, err := getDefaultBranch()
-	if err != nil {
-		return "", err
+func (p *Propr) Generate(branch string) (string, error) {
+	if branch == "" {
+		head, err := getDefaultBranch()
+		if err != nil {
+			return "", err
+		}
+
+		branch = head
 	}
 
 	log.Debug("Fetching diff", "base", branch)
