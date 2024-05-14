@@ -31,7 +31,7 @@ type Config struct {
 }
 
 var CONFIG = config.NewConfig("propr", Config{
-	Model: openai.GPT4Turbo,
+	Model: openai.GPT4o,
 	Prompt: `You will be asked to write a concise GitHub PR description based on a provided git diff.
 Analyze the code changes and provide a concise explanation of the changes, their context and why they were made.
 Don't reference file names or directories directly, instead give a general explanation of the changes made.
@@ -168,7 +168,7 @@ func main() {
 						Name:  "init",
 						Usage: "Initializes propr with a base configuration",
 						Action: func(ctx *cli.Context) error {
-							models := huh.NewOptions(openai.GPT4Turbo, openai.GPT3Dot5Turbo)
+							models := huh.NewOptions(openai.GPT4o, openai.GPT4Turbo, openai.GPT3Dot5Turbo)
 							form := huh.NewForm(
 								huh.NewGroup(
 									huh.NewConfirm().Title("Assistant").Description("Do you want to use an OpenAI assistant to control your prompt?").Value(&CONFIG.Data.Assistant.Enabled),
