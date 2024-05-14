@@ -129,8 +129,11 @@ func (o *OpenAI) GetChatCompletion(diff string) (string, error) {
 }
 
 func (o *OpenAI) GetAssistantCompletion(diff string) (string, error) {
+	config := openai.DefaultConfig(o.ApiKey)
+	config.AssistantVersion = "v2" // `gpt-4o` requires the v2 assistant API
+	client := openai.NewClientWithConfig(config)
+
 	ctx := context.Background()
-	client := openai.NewClient(o.ApiKey)
 	resp, err := client.CreateThreadAndRun(
 		ctx,
 		openai.CreateThreadAndRunRequest{
