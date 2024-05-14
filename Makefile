@@ -1,7 +1,7 @@
 .PHONY: build clean run version
 
 BINARY_NAME=propr
-VERSION=2.4.1
+VERSION=2.4.2
 BUILD_DIR=bin
 
 GOFLAGS=CGO_ENABLED=0
