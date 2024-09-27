@@ -83,7 +83,3 @@ func prepareDiff(diff string) string {
 func generateSystemMessageForDiff(systemMessage string, template string) string {
 	return fmt.Sprintf("%s\n\nFollow this exact template to write your description:\n\n```\n%s\n```", systemMessage, template)
 }
-
-func generateUserMessage(diff string, template string) string {
-	return fmt.Sprintf("Use the following template to write your description, don't deviate from the template:\n\n```\n%s\n```\n\nThe diff:\n\n```\n%s\n```", template, prepareDiff(diff))
-}
