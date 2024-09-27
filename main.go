@@ -44,12 +44,8 @@ type Config struct {
 }
 
 var CONFIG = config.NewConfig("propr", Config{
-	Model: openai.GPT4o,
-	Prompt: `You will be asked to write a concise GitHub PR description based on a provided git diff.
-Analyze the code changes and provide a concise explanation of the changes, their context and why they were made.
-Don't reference file names or directories directly, instead give a general explanation of the changes made.
-Do not treat imports and requires as changes or new features. If the provided message is not a diff respond with an appropriate message.
-Don't surround your description in backticks but still write GitHub supported markdown.`,
+	Model:       openai.GPT4o,
+	Prompt:      SYSTEM_MESSAGE,
 	Template:    "# Description",
 	PrettyPrint: true,
 })
