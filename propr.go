@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/huh/spinner"
@@ -13,7 +14,7 @@ import (
 )
 
 type Propr struct {
-	client OpenAI
+	client MessageClient
 }
 
 func NewPropr() *Propr {
@@ -22,8 +23,27 @@ func NewPropr() *Propr {
 		log.Fatal("OPENAI_API is not set")
 	}
 
+	// Depending on the user selected model, we need to set the corresponding API key
+	var client MessageClient
+	switch CONFIG.Data.Model {
+	case Claude3Dot5Sonnet:
+		apiKey = os.Getenv("ANTHROPIC_API_KEY")
+		if apiKey == "" {
+			log.Fatal("ANTHROPIC_API_KEY is not set")
+		}
+
+		client = NewAnthropic(apiKey, CONFIG.Data.Model)
+	default:
+		apiKey = os.Getenv("OPENAI_API_KEY")
+		if apiKey == "" {
+			log.Fatal("OPENAI_API_KEY is not set")
+		}
+
+		client = NewOpenAI(apiKey, CONFIG.Data.Model)
+	}
+
 	return &Propr{
-		client: *NewOpenAI(apiKey),
+		client,
 	}
 }
 
@@ -49,23 +69,18 @@ func (p *Propr) Generate(branch string) (string, error) {
 
 	var description string
 	err = spinner.New().TitleStyle(lipgloss.NewStyle()).Title("Generating your pull request...").Action(func() {
-		if CONFIG.Data.Assistant.Enabled && CONFIG.Data.Assistant.Id != "" {
-			log.Debug("Using assistant completion")
-			response, err := p.client.GetAssistantCompletion(diff)
-			if err != nil {
-				log.Fatal(err)
-			}
+		log.Debug("Using chat completion")
 
-			description = response
-		} else {
-			log.Debug("Using chat completion")
-			response, err := p.client.GetChatCompletion(diff)
-			if err != nil {
-				log.Fatal(err)
-			}
+		// Set a timeout for the request
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
 
-			description = response
+		response, err := p.client.CreateMessage(ctx, generateSystemMessageForDiff(CONFIG.Data.Prompt, CONFIG.Data.Template), prepareDiff(diff))
+		if err != nil {
+			log.Fatal(err)
 		}
+
+		description = response
 	}).Run()
 
 	if err != nil {

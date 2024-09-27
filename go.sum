@@ -89,6 +89,8 @@ github.com/sashabaranov/go-openai v1.22.0 h1:bjYkELQCbOBMW9B7zi/KA5L4syPfn/3qRvU
 github.com/sashabaranov/go-openai v1.22.0/go.mod h1:lj5b/K+zjTSFxVLijLSTDZuP7adOgerWeFyZLUhAKRg=
 github.com/sashabaranov/go-openai v1.24.0 h1:4H4Pg8Bl2RH/YSnU8DYumZbuHnnkfioor/dtNlB20D4=
 github.com/sashabaranov/go-openai v1.24.0/go.mod h1:lj5b/K+zjTSFxVLijLSTDZuP7adOgerWeFyZLUhAKRg=
+github.com/sashabaranov/go-openai v1.31.0 h1:rGe77x7zUeCjtS2IS7NCY6Tp4bQviXNMhkQM6hz/UC4=
+github.com/sashabaranov/go-openai v1.31.0/go.mod h1:lj5b/K+zjTSFxVLijLSTDZuP7adOgerWeFyZLUhAKRg=
 github.com/segersniels/config v0.0.0-20240503115636-403023c44d9f h1:Hryp2S1kBLyBv78hV2/YQPzwz5xYy0VsixFBqYNXfHc=
 github.com/segersniels/config v0.0.0-20240503115636-403023c44d9f/go.mod h1:ZtYAvjzw4Y8B72nIjqWUnwYKeveEfiNbUilY/ts5MYE=
 github.com/urfave/cli/v2 v2.27.1 h1:8xSQ6szndafKVRmfyeUMxkNUJQMjL1F2zmsZ+qHpfho=

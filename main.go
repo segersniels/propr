@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -17,32 +18,36 @@ import (
 var AppVersion string
 var AppName string
 
-type AssistantConfig struct {
-	Enabled bool   `json:"enabled"`
-	Id      string `json:"id"`
+const (
+	GPT4o             = "gpt-4o"
+	GPT4oMini         = "gpt-4o-mini"
+	GPT4Turbo         = "gpt-4-turbo"
+	GPT3Dot5Turbo     = "gpt-3.5-turbo"
+	Claude3Dot5Sonnet = "claude-3-5-sonnet-20240620"
+)
+
+const (
+	MessageRoleSystem    = "system"
+	MessageRoleUser      = "user"
+	MessageRoleAssistant = "assistant"
+)
+
+type MessageClient interface {
+	CreateMessage(ctx context.Context, system string, prompt string) (string, error)
 }
 
 type Config struct {
-	Model       string          `json:"model"`
-	Prompt      string          `json:"prompt"`
-	Template    string          `json:"template"`
-	PrettyPrint bool            `json:"pretty_print"`
-	Assistant   AssistantConfig `json:"assistant"`
+	Model       string `json:"model"`
+	Prompt      string `json:"prompt"`
+	Template    string `json:"template"`
+	PrettyPrint bool   `json:"pretty_print"`
 }
 
 var CONFIG = config.NewConfig("propr", Config{
-	Model: openai.GPT4o,
-	Prompt: `You will be asked to write a concise GitHub PR description based on a provided git diff.
-Analyze the code changes and provide a concise explanation of the changes, their context and why they were made.
-Don't reference file names or directories directly, instead give a general explanation of the changes made.
-Do not treat imports and requires as changes or new features. If the provided message is not a diff respond with an appropriate message.
-Don't surround your description in backticks but still write GitHub supported markdown.`,
+	Model:       openai.GPT4o,
+	Prompt:      SYSTEM_MESSAGE,
 	Template:    "# Description",
 	PrettyPrint: true,
-	Assistant: AssistantConfig{
-		Enabled: false,
-		Id:      "",
-	},
 })
 
 func printMarkdown(content string, pretty bool) error {
@@ -168,22 +173,12 @@ func main() {
 						Name:  "init",
 						Usage: "Initializes propr with a base configuration",
 						Action: func(ctx *cli.Context) error {
-							models := huh.NewOptions(openai.GPT4o, openai.GPT4Turbo, openai.GPT3Dot5Turbo)
+							models := huh.NewOptions(GPT4oMini, GPT4o, GPT4Turbo, GPT3Dot5Turbo, Claude3Dot5Sonnet)
 							form := huh.NewForm(
-								huh.NewGroup(
-									huh.NewConfirm().Title("Assistant").Description("Do you want to use an OpenAI assistant to control your prompt?").Value(&CONFIG.Data.Assistant.Enabled),
-								),
-								huh.NewGroup(
-									huh.NewInput().Title("Assistant").Description("Provide the assistant's id").Value(&CONFIG.Data.Assistant.Id),
-								).WithHideFunc(func() bool {
-									return !CONFIG.Data.Assistant.Enabled
-								}),
 								huh.NewGroup(
 									huh.NewSelect[string]().Title("Model").Description("Configure the default model").Options(models...).Value(&CONFIG.Data.Model),
 									huh.NewText().Title("Prompt").Description("Configure the default prompt").CharLimit(99999).Value(&CONFIG.Data.Prompt),
-								).WithHideFunc(func() bool {
-									return CONFIG.Data.Assistant.Enabled
-								}),
+								),
 								huh.NewGroup(
 									huh.NewText().Title("Template").Description("Configure the default template").Value(&CONFIG.Data.Template),
 								),
