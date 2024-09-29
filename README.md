@@ -25,6 +25,11 @@ curl -sSL https://raw.githubusercontent.com/segersniels/propr/master/scripts/ins
 
 ## Usage
 
+1. Create a branch
+2. Commit code
+3. Push to origin
+4. Generate your description
+
 ```
 NAME:
    propr - Generate your PRs from the command line with AI
