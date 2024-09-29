@@ -45,7 +45,3 @@ GLOBAL OPTIONS:
    --help, -h     show help
    --version, -v  print the version
 ```
-
-### Using an assistant
-
-You can configure `propr` to use a custom assistant using `propr config init`. This may be interesting if you want to share prompts and templates between devices and/or want to control everything externally.
