@@ -11,7 +11,7 @@ import (
 const SYSTEM_MESSAGE = `You will be asked to write a concise GitHub PR description based on a provided git diff.
 Analyze the code changes and provide a concise explanation of the changes, their context and why they were made.
 If the provided message is not a diff respond with an appropriate message.
-Don't surround your description in backticks but still write GitHub supported markdown.`
+Answer with only the description in GitHub supported markdown.`
 
 var FILES_TO_IGNORE = []string{
 	"package-lock.json",
