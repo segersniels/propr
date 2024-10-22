@@ -15,8 +15,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var AppVersion string
-var AppName string
+var (
+	AppVersion string
+	AppName    string
+)
 
 const (
 	GPT4o             = "gpt-4o"
@@ -95,8 +97,16 @@ func main() {
 						Usage:       "The branch to compare your changes against",
 						DefaultText: "HEAD",
 					},
+					&cli.BoolFlag{
+						Name:  "empty",
+						Usage: "Create an empty PR",
+					},
 				},
 				Action: func(ctx *cli.Context) error {
+					if ctx.Bool("empty") {
+						return propr.Create("")
+					}
+
 					var description string
 					for {
 						response, err := propr.Generate(ctx.String("branch"))
