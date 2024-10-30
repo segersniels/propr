@@ -25,7 +25,7 @@ const (
 	GPT4oMini         = "gpt-4o-mini"
 	GPT4Turbo         = "gpt-4-turbo"
 	GPT3Dot5Turbo     = "gpt-3.5-turbo"
-	Claude3Dot5Sonnet = "claude-3-5-sonnet-20240620"
+	Claude3Dot5Sonnet = "claude-3-5-sonnet-latest"
 )
 
 const (
