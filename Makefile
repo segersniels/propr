@@ -25,9 +25,9 @@ linux-amd64:
 clean:
 	rm -rf $(BUILD_DIR)
 
-run:
-	@$(GOFLAGS) go build -o $(BUILD_DIR)/$(BINARY_NAME) -ldflags $(LDFLAGS)
-	@./bin/$(BINARY_NAME)
+local:
+	go build -o $(BUILD_DIR)/$(BINARY_NAME) -ldflags $(LDFLAGS)
+	cp $(BUILD_DIR)/$(BINARY_NAME) /usr/local/bin/$(BINARY_NAME)
 
 version:
 	@echo $(VERSION)
