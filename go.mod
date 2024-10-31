@@ -1,6 +1,6 @@
 module github.com/segersniels/propr
 
-go 1.22.2
+go 1.22.5
 
 require (
 	github.com/alecthomas/chroma/v2 v2.8.0 // indirect
@@ -22,6 +22,7 @@ require (
 	github.com/google/go-github/v61 v61.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
+	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
@@ -36,6 +37,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sashabaranov/go-openai v1.31.0 // indirect
 	github.com/segersniels/config v0.0.0-20240503115636-403023c44d9f // indirect
+	github.com/segersniels/updater v1.0.0 // indirect
 	github.com/urfave/cli/v2 v2.27.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	github.com/yuin/goldmark v1.5.4 // indirect

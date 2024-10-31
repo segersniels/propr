@@ -12,6 +12,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/sashabaranov/go-openai"
 	"github.com/segersniels/config"
+	updater "github.com/segersniels/updater"
 	"github.com/urfave/cli/v2"
 )
 
@@ -77,6 +78,12 @@ func printMarkdown(content string, pretty bool) error {
 }
 
 func main() {
+	updater := updater.NewUpdater(AppName, AppVersion, "segersniels")
+	err := updater.CheckIfNewVersionIsAvailable()
+	if err != nil {
+		log.Debug("Failed to check for latest release", "error", err)
+	}
+
 	debug := os.Getenv("DEBUG")
 	if debug != "" {
 		log.SetLevel(log.DebugLevel)
@@ -88,6 +95,13 @@ func main() {
 		Usage:   "Generate your PRs from the command line with AI",
 		Version: AppVersion,
 		Commands: []*cli.Command{
+			{
+				Name:  "update",
+				Usage: "Update to the latest version",
+				Action: func(ctx *cli.Context) error {
+					return updater.Update()
+				},
+			},
 			{
 				Name:  "create",
 				Usage: "Creates a PR with a generated description",
