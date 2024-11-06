@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"os/exec"
 	"strings"
 )
@@ -16,28 +15,8 @@ func getCurrentBranch() (string, error) {
 	return strings.TrimSpace(string(stdout)), nil
 }
 
-func getDefaultBranch() (string, error) {
-	cmd := exec.Command("git", "remote", "show", "origin")
-	stdout, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
-
-	// Parse the output to get the default branch
-	scanner := bufio.NewScanner(strings.NewReader(string(stdout)))
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Contains(line, "HEAD branch") {
-			parts := strings.Split(line, ":")
-			return strings.TrimSpace(parts[1]), nil
-		}
-	}
-
-	return string(stdout), nil
-}
-
-func getDiff(branch string) (string, error) {
-	cmd := exec.Command("git", "diff", "origin/"+branch)
+func getDiff(current string, branch string) (string, error) {
+	cmd := exec.Command("git", "diff", "origin/"+branch+".."+current)
 	stdout, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -54,7 +33,6 @@ func fetchRemoteOrigin() (string, error) {
 	}
 
 	return strings.TrimSpace(string(stdout)), nil
-
 }
 
 type RepositoryInformation struct {
@@ -76,4 +54,14 @@ func getRepositoryInformation() (*RepositoryInformation, error) {
 		Name:  name,
 		Owner: owner,
 	}, nil
+}
+
+func getCommitMessages(current string, branch string) ([]string, error) {
+	cmd := exec.Command("git", "log", "--oneline", "origin/"+branch+".."+current)
+	stdout, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	return strings.Split(string(stdout), "\n"), nil
 }

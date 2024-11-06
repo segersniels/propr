@@ -20,25 +20,32 @@ func NewOpenAI(apiKey, model string) *OpenAI {
 	}
 }
 
-func (o *OpenAI) CreateMessage(ctx context.Context, system string, prompt string) (string, error) {
+func convertToOpenAIMessages(messages []Message) []openai.ChatCompletionMessage {
+	var msgs []openai.ChatCompletionMessage
+	for _, m := range messages {
+		msgs = append(msgs, openai.ChatCompletionMessage{
+			Role:    string(m.Role),
+			Content: m.Content,
+		})
+	}
+
+	return msgs
+}
+
+func (o *OpenAI) CreateMessage(ctx context.Context, system string, messages []Message) (string, error) {
 	client := openai.NewClient(o.apiKey)
 	resp, err := client.CreateChatCompletion(
 		ctx,
 		openai.ChatCompletionRequest{
 			Model: o.model,
-			Messages: []openai.ChatCompletionMessage{
+			Messages: append([]openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleSystem,
 					Content: system,
 				},
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: prompt,
-				},
-			},
+			}, convertToOpenAIMessages(messages)...),
 		},
 	)
-
 	if err != nil {
 		return "", err
 	}

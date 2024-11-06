@@ -29,14 +29,21 @@ const (
 	Claude3Dot5Sonnet = "claude-3-5-sonnet-latest"
 )
 
+type MessageRole string
+
 const (
-	MessageRoleSystem    = "system"
-	MessageRoleUser      = "user"
-	MessageRoleAssistant = "assistant"
+	MessageRoleSystem    MessageRole = "system"
+	MessageRoleUser      MessageRole = "user"
+	MessageRoleAssistant MessageRole = "assistant"
 )
 
+type Message struct {
+	Role    MessageRole
+	Content string
+}
+
 type MessageClient interface {
-	CreateMessage(ctx context.Context, system string, prompt string) (string, error)
+	CreateMessage(ctx context.Context, system string, messages []Message) (string, error)
 }
 
 type Config struct {
@@ -117,13 +124,14 @@ func main() {
 					},
 				},
 				Action: func(ctx *cli.Context) error {
+					branch := ctx.String("branch")
 					if ctx.Bool("empty") {
-						return propr.Create("")
+						return propr.Create(branch, "")
 					}
 
 					var description string
 					for {
-						response, err := propr.Generate(ctx.String("branch"))
+						response, err := propr.Generate(branch)
 						if err != nil {
 							log.Fatal(err)
 						}
@@ -145,7 +153,7 @@ func main() {
 						}
 					}
 
-					return propr.Create(description)
+					return propr.Create(branch, description)
 				},
 			},
 			{
