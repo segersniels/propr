@@ -106,8 +106,16 @@ func (p *Propr) Generate(target string) (string, error) {
 				Content: current,
 			},
 			{
+				Role:    MessageRoleAssistant,
+				Content: "Thanks for providing the branch. What about the commit messages?",
+			},
+			{
 				Role:    MessageRoleUser,
 				Content: strings.Join(commits, "\n"),
+			},
+			{
+				Role:    MessageRoleAssistant,
+				Content: "Thanks for providing the commit messages. Now the final step to generate a description is to see what's changed using the diff",
 			},
 			{
 				Role:    MessageRoleUser,
