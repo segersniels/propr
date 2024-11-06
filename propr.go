@@ -103,6 +103,14 @@ func (p *Propr) Generate(target string) (string, error) {
 		messages := []Message{
 			{
 				Role:    MessageRoleUser,
+				Content: p.repo.GetURL(),
+			},
+			{
+				Role:    MessageRoleAssistant,
+				Content: "Thanks for providing the repository URL. What about the branch?",
+			},
+			{
+				Role:    MessageRoleUser,
 				Content: current,
 			},
 			{

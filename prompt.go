@@ -10,9 +10,11 @@ import (
 
 const SYSTEM_MESSAGE = `You are responsible to write a concise GitHub PR description.
 You will be provided with the current branch name, the diff and the commit messages to provide you with enough
-context to write a proper description. Analyze the code changes and provide a concise explanation of the changes, 
+context to write a proper description. Analyze the code changes and provide a concise explanation of the changes,
 their context and why they were made. If the provided message is not a diff respond with an appropriate message.
-Only answer with the raw markdown description matching the template, do not include any other text.`
+Only answer with the raw markdown description matching the template, do not include any other text.
+If you are able to, provide linked footnotes in the description to reference the relevant code changes.
+`
 
 var FILES_TO_IGNORE = []string{
 	"package-lock.json",
