@@ -13,6 +13,7 @@ You will be provided with the current branch name, the diff and the commit messa
 context to write a proper description. Analyze the code changes and provide a concise explanation of the changes,
 their context and why they were made. If the provided message is not a diff respond with an appropriate message.
 Only answer with the raw markdown description matching the template, do not include any other text.
+Don't wrap your response in a markdown code block since GitHub will render it properly.
 If you are able to, provide linked footnotes in the description to reference the relevant code changes.
 `
 
