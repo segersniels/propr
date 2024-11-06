@@ -14,30 +14,19 @@ import (
 	"github.com/google/go-github/v61/github"
 )
 
-type Propr struct {
-	client MessageClient
-	gh     *github.Client
-	repo   *github.Repository
-}
-
-func NewPropr() *Propr {
-	apiKey := os.Getenv("OPENAI_API_KEY")
-	if apiKey == "" {
-		log.Fatal("OPENAI_API is not set")
-	}
-
-	// Depending on the user selected model, we need to set the corresponding API key
+func NewMessageClient() MessageClient {
 	var client MessageClient
+
 	switch CONFIG.Data.Model {
 	case Claude3Dot5Sonnet:
-		apiKey = os.Getenv("ANTHROPIC_API_KEY")
+		apiKey := os.Getenv("ANTHROPIC_API_KEY")
 		if apiKey == "" {
 			log.Fatal("ANTHROPIC_API_KEY is not set")
 		}
 
 		client = NewAnthropic(apiKey, CONFIG.Data.Model)
 	default:
-		apiKey = os.Getenv("OPENAI_API_KEY")
+		apiKey := os.Getenv("OPENAI_API_KEY")
 		if apiKey == "" {
 			log.Fatal("OPENAI_API_KEY is not set")
 		}
@@ -45,14 +34,23 @@ func NewPropr() *Propr {
 		client = NewOpenAI(apiKey, CONFIG.Data.Model)
 	}
 
-	token := os.Getenv("GITHUB_TOKEN")
-	if token == "" {
-		log.Fatal("GITHUB_TOKEN is not set")
-	}
+	return client
+}
 
+type Propr struct {
+	gh   *github.Client
+	repo *github.Repository
+}
+
+func NewPropr() *Propr {
 	info, err := getRepositoryInformation()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" {
+		log.Fatal("GITHUB_TOKEN is not set")
 	}
 
 	gh := github.NewClient(nil).WithAuthToken(token)
@@ -62,7 +60,6 @@ func NewPropr() *Propr {
 	}
 
 	return &Propr{
-		client,
 		gh,
 		repo,
 	}
@@ -131,7 +128,8 @@ func (p *Propr) Generate(target string) (string, error) {
 			},
 		}
 
-		response, err := p.client.CreateMessage(ctx, generateSystemMessageForDiff(CONFIG.Data.Prompt, CONFIG.Data.Template), messages)
+		client := NewMessageClient()
+		response, err := client.CreateMessage(ctx, generateSystemMessageForDiff(CONFIG.Data.Prompt, CONFIG.Data.Template), messages)
 		if err != nil {
 			log.Fatal(err)
 		}
