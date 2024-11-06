@@ -38,8 +38,8 @@ const (
 )
 
 type Message struct {
-	Role    MessageRole
-	Content string
+	Role    MessageRole `json:"role"`
+	Content string      `json:"content"`
 }
 
 type MessageClient interface {
