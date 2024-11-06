@@ -154,8 +154,11 @@ func (p *Propr) Create(target string, description string) error {
 	}
 
 	branch := p.repo.GetDefaultBranch()
-	log.Debug("Creating pull request", "head", branch, "base", target)
-	pr, response, err := p.gh.PullRequests.Create(context.Background(), *p.repo.Owner.Name, *p.repo.Name, &github.NewPullRequest{
+	owner := p.repo.GetOwner().GetLogin()
+	name := p.repo.GetName()
+
+	log.Debug("Creating pull request", "head", branch, "base", target, "owner", owner, "name", name)
+	pr, response, err := p.gh.PullRequests.Create(context.Background(), owner, name, &github.NewPullRequest{
 		Head:  github.String(branch),
 		Base:  github.String(target),
 		Title: github.String(title),
