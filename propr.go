@@ -161,7 +161,11 @@ func (p *Propr) Create(target string, description string) error {
 		return nil
 	}
 
-	branch := p.repo.GetDefaultBranch()
+	branch, err := getCurrentBranch()
+	if err != nil {
+		return err
+	}
+
 	owner := p.repo.GetOwner().GetLogin()
 	name := p.repo.GetName()
 
