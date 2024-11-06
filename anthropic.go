@@ -52,19 +52,13 @@ func NewAnthropic(apiKey, model string) *Anthropic {
 	}
 }
 
-func (a *Anthropic) CreateMessage(ctx context.Context, system string, prompt string) (string, error) {
+func (a *Anthropic) CreateMessage(ctx context.Context, system string, messages []Message) (string, error) {
 	body, err := json.Marshal(map[string]interface{}{
 		"model":      a.model,
 		"max_tokens": 4096,
 		"system":     system,
-		"messages": []ClaudeMessage{
-			{
-				Role:    MessageRoleUser,
-				Content: prompt,
-			},
-		},
+		"messages":   messages,
 	})
-
 	if err != nil {
 		return "", fmt.Errorf("error marshaling JSON payload: %v", err)
 	}
@@ -85,7 +79,9 @@ func (a *Anthropic) CreateMessage(ctx context.Context, system string, prompt str
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		var errResp bytes.Buffer
+		_, _ = errResp.ReadFrom(resp.Body)
+		return "", fmt.Errorf("unexpected status code: %d, response: %s", resp.StatusCode, errResp.String())
 	}
 
 	var data ClaudeMessagesResponse

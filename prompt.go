@@ -8,10 +8,14 @@ import (
 	"github.com/charmbracelet/log"
 )
 
-const SYSTEM_MESSAGE = `You will be asked to write a concise GitHub PR description based on a provided git diff.
-Analyze the code changes and provide a concise explanation of the changes, their context and why they were made.
-If the provided message is not a diff respond with an appropriate message.
-Only answer with the raw markdown description matching the template, do not include any other text.`
+const SYSTEM_MESSAGE = `You are responsible to write a concise GitHub PR description.
+You will be provided with the current branch name, the diff and the commit messages to provide you with enough
+context to write a proper description. Analyze the code changes and provide a concise explanation of the changes,
+their context and why they were made. If the provided message is not a diff respond with an appropriate message.
+Only answer with the raw markdown description matching the template, do not include any other text.
+Don't wrap your response in a markdown code block since GitHub will render it properly.
+If you are able to, provide footnotes in the description to reference the relevant code changes (links to line of codes).
+`
 
 var FILES_TO_IGNORE = []string{
 	"package-lock.json",
