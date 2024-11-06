@@ -79,7 +79,9 @@ func (a *Anthropic) CreateMessage(ctx context.Context, system string, messages [
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		var errResp bytes.Buffer
+		_, _ = errResp.ReadFrom(resp.Body)
+		return "", fmt.Errorf("unexpected status code: %d, response: %s", resp.StatusCode, errResp.String())
 	}
 
 	var data ClaudeMessagesResponse
