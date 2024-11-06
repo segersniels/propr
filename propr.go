@@ -37,37 +37,44 @@ func NewMessageClient() MessageClient {
 	return client
 }
 
-type Propr struct {
-	gh   *github.Client
-	repo *github.Repository
+type GitHub struct {
+	client *github.Client
+	repo   *github.Repository
 }
 
-func NewPropr() *Propr {
-	info, err := getRepositoryInformation()
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func NewGitHub() *GitHub {
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
 		log.Fatal("GITHUB_TOKEN is not set")
 	}
 
 	gh := github.NewClient(nil).WithAuthToken(token)
+	info, err := getRepositoryInformation()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	repo, _, err := gh.Repositories.Get(context.Background(), info.Owner, info.Name)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &Propr{
+	return &GitHub{
 		gh,
 		repo,
 	}
 }
 
+type Propr struct{}
+
+func NewPropr() *Propr {
+	return &Propr{}
+}
+
 func (p *Propr) Generate(target string) (string, error) {
+	gh := NewGitHub()
 	if target == "" {
-		target = p.repo.GetDefaultBranch()
+		target = gh.repo.GetDefaultBranch()
 	}
 
 	current, err := getCurrentBranch()
@@ -100,7 +107,7 @@ func (p *Propr) Generate(target string) (string, error) {
 		messages := []Message{
 			{
 				Role:    MessageRoleUser,
-				Content: p.repo.GetURL(),
+				Content: gh.repo.GetURL(),
 			},
 			{
 				Role:    MessageRoleAssistant,
@@ -144,8 +151,9 @@ func (p *Propr) Generate(target string) (string, error) {
 }
 
 func (p *Propr) Create(target string, description string) error {
+	gh := NewGitHub()
 	if target == "" {
-		target = p.repo.GetDefaultBranch()
+		target = gh.repo.GetDefaultBranch()
 	}
 
 	token := os.Getenv("GITHUB_TOKEN")
@@ -164,11 +172,11 @@ func (p *Propr) Create(target string, description string) error {
 		return err
 	}
 
-	owner := p.repo.GetOwner().GetLogin()
-	name := p.repo.GetName()
+	owner := gh.repo.GetOwner().GetLogin()
+	name := gh.repo.GetName()
 
 	log.Debug("Creating pull request", "head", branch, "base", target, "owner", owner, "name", name)
-	pr, response, err := p.gh.PullRequests.Create(context.Background(), owner, name, &github.NewPullRequest{
+	pr, response, err := gh.client.PullRequests.Create(context.Background(), owner, name, &github.NewPullRequest{
 		Head:  github.String(branch),
 		Base:  github.String(target),
 		Title: github.String(title),
