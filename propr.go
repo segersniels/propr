@@ -139,7 +139,7 @@ func (p *Propr) Generate(target string) (string, error) {
 
 func (p *Propr) Create(target string, description string) error {
 	if target == "" {
-		target = p.repo.GetMasterBranch()
+		target = p.repo.GetDefaultBranch()
 	}
 
 	token := os.Getenv("GITHUB_TOKEN")
