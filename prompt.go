@@ -14,7 +14,7 @@ context to write a proper description. Analyze the code changes and provide a co
 their context and why they were made. If the provided message is not a diff respond with an appropriate message.
 Only answer with the raw markdown description matching the template, do not include any other text.
 Don't wrap your response in a markdown code block since GitHub will render it properly.
-If you are able to, provide linked footnotes in the description to reference the relevant code changes.
+If you are able to, provide footnotes in the description to reference the relevant code changes (links to line of codes).
 `
 
 var FILES_TO_IGNORE = []string{
