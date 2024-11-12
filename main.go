@@ -122,11 +122,16 @@ func main() {
 						Name:  "empty",
 						Usage: "Create an empty PR",
 					},
+					&cli.BoolFlag{
+						Name:  "draft",
+						Usage: "Create a draft PR",
+					},
 				},
 				Action: func(ctx *cli.Context) error {
+					draft := ctx.Bool("draft")
 					branch := ctx.String("branch")
 					if ctx.Bool("empty") {
-						return propr.Create(branch, "")
+						return propr.Create(branch, "", draft)
 					}
 
 					var description string
@@ -153,7 +158,7 @@ func main() {
 						}
 					}
 
-					return propr.Create(branch, description)
+					return propr.Create(branch, description, draft)
 				},
 			},
 			{

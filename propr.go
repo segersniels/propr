@@ -150,7 +150,7 @@ func (p *Propr) Generate(target string) (string, error) {
 	return description, nil
 }
 
-func (p *Propr) Create(target string, description string) error {
+func (p *Propr) Create(target string, description string, draft bool) error {
 	gh := NewGitHub()
 	if target == "" {
 		target = gh.repo.GetDefaultBranch()
@@ -181,6 +181,7 @@ func (p *Propr) Create(target string, description string) error {
 		Base:  github.String(target),
 		Title: github.String(title),
 		Body:  github.String(description),
+		Draft: github.Bool(draft),
 	})
 
 	if err != nil {
