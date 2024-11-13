@@ -17,6 +17,8 @@ curl -sSL https://raw.githubusercontent.com/segersniels/propr/master/scripts/ins
 curl -sSL https://raw.githubusercontent.com/segersniels/propr/master/scripts/install.sh | sudo bash -s /usr/local/bin
 ```
 
+
+
 ### Manual
 
 1. Download the latest binary from the [releases](https://github.com/segersniels/propr/releases/latest) page for your system
@@ -30,7 +32,7 @@ curl -sSL https://raw.githubusercontent.com/segersniels/propr/master/scripts/ins
 3. Push to origin
 4. Generate your description
 
-```
+```bash
 NAME:
    propr - Generate your PRs from the command line with AI
 
