@@ -5,8 +5,7 @@
 Generate GitHub PR descriptions from the command line with the help of AI.
 `propr` aims to populate a basic PR description right from your terminal so you can focus on more important things.
 
-<p align="center">
-<img src="./resources/logo.png" width="250">
+![logo](./resources/logo.png)
 
 ## Install
 
@@ -16,8 +15,6 @@ curl -sSL https://raw.githubusercontent.com/segersniels/propr/master/scripts/ins
 # Install in /usr/local/bin
 curl -sSL https://raw.githubusercontent.com/segersniels/propr/master/scripts/install.sh | sudo bash -s /usr/local/bin
 ```
-
-
 
 ### Manual
 
