@@ -42,10 +42,10 @@ type ClaudeMessagesResponse struct {
 
 type Anthropic struct {
 	apiKey string
-	model  string
+	model  SupportedModel
 }
 
-func NewAnthropic(apiKey, model string) *Anthropic {
+func NewAnthropic(apiKey string, model SupportedModel) *Anthropic {
 	return &Anthropic{
 		apiKey,
 		model,

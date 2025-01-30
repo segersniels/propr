@@ -10,10 +10,10 @@ var _ MessageClient = (*OpenAI)(nil)
 
 type OpenAI struct {
 	apiKey string
-	model  string
+	model  SupportedModel
 }
 
-func NewOpenAI(apiKey, model string) *OpenAI {
+func NewOpenAI(apiKey string, model SupportedModel) *OpenAI {
 	return &OpenAI{
 		apiKey,
 		model,
@@ -37,7 +37,7 @@ func (o *OpenAI) CreateMessage(ctx context.Context, system string, messages []Me
 	resp, err := client.CreateChatCompletion(
 		ctx,
 		openai.ChatCompletionRequest{
-			Model: o.model,
+			Model: string(o.model),
 			Messages: append([]openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleSystem,

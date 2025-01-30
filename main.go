@@ -10,7 +10,6 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/log"
-	"github.com/sashabaranov/go-openai"
 	"github.com/segersniels/config"
 	updater "github.com/segersniels/updater"
 	"github.com/urfave/cli/v2"
@@ -21,13 +20,29 @@ var (
 	AppName    string
 )
 
+type SupportedModel string
+
 const (
-	GPT4o             = "gpt-4o"
-	GPT4oMini         = "gpt-4o-mini"
-	GPT4Turbo         = "gpt-4-turbo"
-	GPT3Dot5Turbo     = "gpt-3.5-turbo"
-	Claude3Dot5Sonnet = "claude-3-5-sonnet-latest"
+	GPT4o             SupportedModel = "gpt-4o"
+	GPT4oMini         SupportedModel = "gpt-4o-mini"
+	GPTo1             SupportedModel = "o1"
+	GPTo1Mini         SupportedModel = "o1-mini"
+	Claude3Dot5Sonnet SupportedModel = "claude-3-5-sonnet-latest"
+	Claude3Dot5Haiku  SupportedModel = "claude-3-5-haiku-latest"
+	DeepSeekChat      SupportedModel = "deepseek-chat"
+	DeepSeekReasoner  SupportedModel = "deepseek-reasoner"
 )
+
+var SupportedModels = []SupportedModel{
+	GPT4o,
+	GPT4oMini,
+	GPTo1,
+	GPTo1Mini,
+	Claude3Dot5Sonnet,
+	Claude3Dot5Haiku,
+	DeepSeekChat,
+	DeepSeekReasoner,
+}
 
 type MessageRole string
 
@@ -47,14 +62,14 @@ type MessageClient interface {
 }
 
 type Config struct {
-	Model       string `json:"model"`
-	Prompt      string `json:"prompt"`
-	Template    string `json:"template"`
-	PrettyPrint bool   `json:"pretty_print"`
+	Model       SupportedModel `json:"model"`
+	Prompt      string         `json:"prompt"`
+	Template    string         `json:"template"`
+	PrettyPrint bool           `json:"pretty_print"`
 }
 
 var CONFIG = config.NewConfig("propr", Config{
-	Model:       openai.GPT4o,
+	Model:       GPT4oMini,
 	Prompt:      SYSTEM_MESSAGE,
 	Template:    "# Description",
 	PrettyPrint: true,
@@ -210,10 +225,10 @@ func main() {
 						Name:  "init",
 						Usage: "Initializes propr with a base configuration",
 						Action: func(ctx *cli.Context) error {
-							models := huh.NewOptions(GPT4oMini, GPT4o, GPT4Turbo, GPT3Dot5Turbo, Claude3Dot5Sonnet)
+							models := huh.NewOptions(SupportedModels...)
 							form := huh.NewForm(
 								huh.NewGroup(
-									huh.NewSelect[string]().Title("Model").Description("Configure the default model").Options(models...).Value(&CONFIG.Data.Model),
+									huh.NewSelect[SupportedModel]().Title("Model").Description("Configure the default model").Options(models...).Value(&CONFIG.Data.Model),
 									huh.NewText().Title("Prompt").Description("Configure the default prompt").CharLimit(99999).Value(&CONFIG.Data.Prompt),
 								),
 								huh.NewGroup(

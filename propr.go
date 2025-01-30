@@ -18,6 +18,7 @@ func NewMessageClient() MessageClient {
 	var client MessageClient
 
 	switch CONFIG.Data.Model {
+	case Claude3Dot5Haiku:
 	case Claude3Dot5Sonnet:
 		apiKey := os.Getenv("ANTHROPIC_API_KEY")
 		if apiKey == "" {
@@ -25,6 +26,14 @@ func NewMessageClient() MessageClient {
 		}
 
 		client = NewAnthropic(apiKey, CONFIG.Data.Model)
+	case DeepSeekChat:
+	case DeepSeekReasoner:
+		apiKey := os.Getenv("DEEPSEEK_API_KEY")
+		if apiKey == "" {
+			log.Fatal("DEEPSEEK_API_KEY is not set")
+		}
+
+		client = NewDeepSeek(apiKey, CONFIG.Data.Model)
 	default:
 		apiKey := os.Getenv("OPENAI_API_KEY")
 		if apiKey == "" {
