@@ -1,0 +1,41 @@
+{
+  "name": "@segersniels/propr",
+  "version": "2.10.0",
+  "description": "Generate GitHub PR descriptions from the command line with the help of AI. It aims to populate a basic PR description right from your terminal so you can focus on more important things.",
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "scripts"
+  ],
+  "bin": {
+    "propr": "./bin/propr"
+  },
+  "scripts": {
+    "preinstall": "mkdir -p $(npm root -g)/@segersniels/propr/bin && ./scripts/install.sh $(npm root -g)/@segersniels/propr/bin"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/segersniels/propr.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "cli",
+    "diff",
+    "ai",
+    "pr",
+    "pull-request",
+    "generate",
+    "description",
+    "github"
+  ],
+  "author": "Niels Segers",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/segersniels/propr/issues"
+  },
+  "homepage": "https://github.com/segersniels/propr#readme"
+}

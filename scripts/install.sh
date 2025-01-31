@@ -1,7 +1,10 @@
 #!/bin/bash
 
+# Define the package name
+PACKAGE_NAME="propr"
+
 # Base URL for downloading binaries
-BASE_URL="https://github.com/segersniels/propr/releases/latest/download"
+BASE_URL="https://github.com/segersniels/${PACKAGE_NAME}/releases/latest/download"
 
 # Default destination directory (current directory)
 DEST_DIR="."
@@ -35,11 +38,11 @@ arm64*) arch=arm64 ;;
 esac
 
 # Construct binary name and download URL
-BIN_NAME="propr-${os}-${arch}"
+BIN_NAME="${PACKAGE_NAME}-${os}-${arch}"
 DOWNLOAD_URL="${BASE_URL}/${BIN_NAME}"
 
 # Full path to the target binary
-FULL_PATH="${DEST_DIR}/propr"
+FULL_PATH="${DEST_DIR}/${PACKAGE_NAME}"
 
 echo "Downloading ${BIN_NAME} to ${FULL_PATH}..."
 
