@@ -5,8 +5,6 @@
 Generate GitHub PR descriptions from the command line with the help of AI.
 `propr` aims to populate a basic PR description right from your terminal so you can focus on more important things.
 
-![logo](./resources/logo.png)
-
 ## Install
 
 ### NPM
