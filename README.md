@@ -1,6 +1,6 @@
 # Propr
 
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/segersniels/propr/ci.yml)
+[![npm](https://img.shields.io/npm/v/@segersniels/propr)](https://www.npmjs.com/package/@segersniels/propr)![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/segersniels/propr/ci.yml)
 
 Generate GitHub PR descriptions from the command line with the help of AI.
 `propr` aims to populate a basic PR description right from your terminal so you can focus on more important things.
@@ -8,6 +8,14 @@ Generate GitHub PR descriptions from the command line with the help of AI.
 ![logo](./resources/logo.png)
 
 ## Install
+
+### NPM
+
+```bash
+npm install -g @segersniels/propr
+```
+
+### Script
 
 ```bash
 # Install in the current directory
@@ -24,10 +32,7 @@ curl -sSL https://raw.githubusercontent.com/segersniels/propr/master/scripts/ins
 
 ## Usage
 
-1. Create a branch
-2. Commit code
-3. Push to origin
-4. Generate your description
+Before you can get started write some code and push it to a branch. Then depending on your needs you can use the following commands:
 
 ```bash
 NAME:
