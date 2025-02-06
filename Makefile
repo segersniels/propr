@@ -14,8 +14,10 @@ $(TARGETS):
 clean:
 	rm -rf $(BUILD_DIR)
 
-local:
+dev:
 	go build -o $(BUILD_DIR)/$(BINARY_NAME) -ldflags "$(LDFLAGS)"
+
+local: dev
 	cp $(BUILD_DIR)/$(BINARY_NAME) /usr/local/bin/$(BINARY_NAME)
 
 version:
