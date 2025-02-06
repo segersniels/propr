@@ -118,13 +118,6 @@ func main() {
 		Version: AppVersion,
 		Commands: []*cli.Command{
 			{
-				Name:  "update",
-				Usage: "Update to the latest version",
-				Action: func(ctx *cli.Context) error {
-					return upd.Update()
-				},
-			},
-			{
 				Name:  "create",
 				Usage: "Creates a PR with a generated description",
 				Flags: []cli.Flag{
