@@ -104,7 +104,7 @@ func (p *Propr) Generate(target string) (string, error) {
 	var description string
 	err = spinner.New().TitleStyle(lipgloss.NewStyle()).Title("Generating your pull request...").Action(func() {
 		// Set a timeout for the request
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		defer cancel()
 
 		commits, err := getCommitMessages(current, target)
