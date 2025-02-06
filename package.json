@@ -1,6 +1,6 @@
 {
   "name": "@segersniels/propr",
-  "version": "2.10.1",
+  "version": "2.10.2",
   "description": "Generate GitHub PR descriptions from the command line with the help of AI. It aims to populate a basic PR description right from your terminal so you can focus on more important things.",
   "files": [
     "package.json",
