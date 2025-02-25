@@ -18,6 +18,7 @@ func NewMessageClient() MessageClient {
 	var client MessageClient
 
 	switch CONFIG.Data.Model {
+	case Claude3Dot7Sonnet:
 	case Claude3Dot5Haiku:
 	case Claude3Dot5Sonnet:
 		apiKey := os.Getenv("ANTHROPIC_API_KEY")
