@@ -29,6 +29,8 @@ var FILES_TO_IGNORE = []string{
 	"Pipfile.lock",
 	"composer.lock",
 	"go.sum",
+	"bun.lockb",
+	"bun.lock",
 }
 
 func splitDiffIntoChunks(diff string) []string {
