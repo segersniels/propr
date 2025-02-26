@@ -41,6 +41,8 @@ func NewMessageClient() MessageClient {
 		client = NewOpenAI(apiKey, CONFIG.Data.Model)
 	}
 
+	log.Debug("Client initialized for", "model", CONFIG.Data.Model)
+
 	return client
 }
 
@@ -142,8 +144,13 @@ func (p *Propr) Generate(target string) (string, error) {
 			},
 		}
 
+		log.Debug("Constructed messages to send to the provider", "messages", messages)
+
 		client := NewMessageClient()
-		response, err := client.CreateMessage(ctx, generateSystemMessageForDiff(CONFIG.Data.Prompt, CONFIG.Data.Template), messages)
+		systemMessage := generateSystemMessageForDiff(CONFIG.Data.Prompt, CONFIG.Data.Template)
+		log.Debug("Constructed system instructions", "message", systemMessage)
+
+		response, err := client.CreateMessage(ctx, systemMessage, messages)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/charmbracelet/log"
 )
 
 var _ MessageClient = (*Anthropic)(nil)
@@ -59,10 +61,12 @@ func (a *Anthropic) CreateMessage(ctx context.Context, system string, messages [
 		"system":     system,
 		"messages":   messages,
 	})
+
 	if err != nil {
 		return "", fmt.Errorf("error marshaling JSON payload: %v", err)
 	}
 
+	log.Debug("Sending request to Anthropic", "body", string(body))
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://api.anthropic.com/v1/messages", bytes.NewBuffer(body))
 	if err != nil {
 		return "", fmt.Errorf("error creating request: %v", err)
