@@ -91,5 +91,5 @@ func prepareDiff(diff string) string {
 }
 
 func generateSystemMessageForDiff(systemMessage string, template string) string {
-	return fmt.Sprintf("%s\n\nFollow this exact template to write your description:\n\n```\n%s\n```", systemMessage, template)
+	return fmt.Sprintf("%s\n\nFollow this exact template to write your description:\n\n%s", systemMessage, template)
 }
