@@ -69,7 +69,6 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	propr := NewPropr()
 	app := &cli.App{
 		Name:    AppName,
 		Usage:   "Generate your PRs from the command line with AI",
@@ -79,10 +78,15 @@ func main() {
 				Name:  "create",
 				Usage: "Creates a PR with a generated description",
 				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:        "branch",
-						Usage:       "The branch to compare your changes against",
-						DefaultText: "HEAD",
+					&cli.BoolFlag{
+						Name:    "branch",
+						Aliases: []string{"b"},
+						Usage:   "Select a branch from a list",
+					},
+					&cli.BoolFlag{
+						Name:    "model",
+						Aliases: []string{"m"},
+						Usage:   "Select a model from a list",
 					},
 					&cli.BoolFlag{
 						Name:  "empty",
@@ -95,14 +99,19 @@ func main() {
 				},
 				Action: func(ctx *cli.Context) error {
 					draft := ctx.Bool("draft")
-					branch := ctx.String("branch")
+
+					propr, err := NewPropr(ctx)
+					if err != nil {
+						log.Fatal(err)
+					}
+
 					if ctx.Bool("empty") {
-						return propr.Create(branch, "", draft)
+						return propr.Create("", "", draft)
 					}
 
 					var description string
 					for {
-						response, err := propr.Generate(branch)
+						response, err := propr.Generate("")
 						if err != nil {
 							log.Fatal(err)
 						}
@@ -124,7 +133,7 @@ func main() {
 						}
 					}
 
-					return propr.Create(branch, description, draft)
+					return propr.Create("", description, draft)
 				},
 			},
 			{
@@ -135,14 +144,24 @@ func main() {
 						Name:  "plain",
 						Usage: "Output the generated description without any formatting",
 					},
-					&cli.StringFlag{
-						Name:        "branch",
-						Usage:       "The branch to compare your changes against",
-						DefaultText: "HEAD",
+					&cli.BoolFlag{
+						Name:    "branch",
+						Aliases: []string{"b"},
+						Usage:   "Select a branch from a list",
+					},
+					&cli.BoolFlag{
+						Name:    "model",
+						Aliases: []string{"m"},
+						Usage:   "Select a model from a list",
 					},
 				},
 				Action: func(ctx *cli.Context) error {
-					description, err := propr.Generate(ctx.String("branch"))
+					propr, err := NewPropr(ctx)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					description, err := propr.Generate("")
 					if err != nil {
 						log.Fatal(err)
 					}

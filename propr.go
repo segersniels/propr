@@ -12,36 +12,37 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/google/go-github/v61/github"
+	"github.com/urfave/cli/v2"
 )
 
-func NewMessageClient() MessageClient {
+func NewMessageClient(model SupportedModel) MessageClient {
 	var client MessageClient
 
-	switch CONFIG.Data.Model {
+	switch model {
 	case Claude3Dot7Sonnet, Claude3Dot5Haiku, Claude3Dot5Sonnet:
 		apiKey := os.Getenv("ANTHROPIC_API_KEY")
 		if apiKey == "" {
 			log.Fatal("ANTHROPIC_API_KEY is not set")
 		}
 
-		client = NewAnthropic(apiKey, CONFIG.Data.Model)
+		client = NewAnthropic(apiKey, model)
 	case DeepSeekChat, DeepSeekReasoner:
 		apiKey := os.Getenv("DEEPSEEK_API_KEY")
 		if apiKey == "" {
 			log.Fatal("DEEPSEEK_API_KEY is not set")
 		}
 
-		client = NewDeepSeek(apiKey, CONFIG.Data.Model)
+		client = NewDeepSeek(apiKey, model)
 	default:
 		apiKey := os.Getenv("OPENAI_API_KEY")
 		if apiKey == "" {
 			log.Fatal("OPENAI_API_KEY is not set")
 		}
 
-		client = NewOpenAI(apiKey, CONFIG.Data.Model)
+		client = NewOpenAI(apiKey, model)
 	}
 
-	log.Debug("Client initialized for", "model", CONFIG.Data.Model)
+	log.Debug("Client initialized for", "model", model)
 
 	return client
 }
@@ -74,10 +75,106 @@ func NewGitHub() *GitHub {
 	}
 }
 
-type Propr struct{}
+func selectBranch() (string, error) {
+	branches, err := getAllBranches()
+	if err != nil {
+		return "", err
+	}
 
-func NewPropr() *Propr {
-	return &Propr{}
+	if len(branches) == 0 {
+		return "", fmt.Errorf("no branches found")
+	}
+
+	currentBranch, err := getCurrentBranch()
+	if err != nil {
+		return "", err
+	}
+
+	filteredBranches := []string{}
+	for _, branch := range branches {
+		if branch != currentBranch {
+			filteredBranches = append(filteredBranches, branch)
+		}
+	}
+
+	if len(filteredBranches) == 0 {
+		return "", fmt.Errorf("no other branches found")
+	}
+
+	options := make([]huh.Option[string], len(filteredBranches))
+	for i, branch := range filteredBranches {
+		options[i] = huh.NewOption(branch, branch)
+	}
+
+	var selectedBranch string
+	err = huh.NewSelect[string]().
+		Title("Select a branch").
+		Options(options...).
+		Value(&selectedBranch).
+		Filtering(true).
+		Run()
+
+	if err != nil {
+		return "", err
+	}
+
+	return selectedBranch, nil
+}
+
+func selectModel() (SupportedModel, error) {
+	options := huh.NewOptions(SupportedModels...)
+
+	var selectedModel SupportedModel = CONFIG.Data.Model
+	err := huh.NewSelect[SupportedModel]().
+		Title("Select a model").
+		Options(options...).
+		Value(&selectedModel).
+		Filtering(true).
+		Run()
+
+	if err != nil {
+		return "", err
+	}
+
+	return selectedModel, nil
+}
+
+type Propr struct {
+	model  SupportedModel
+	branch string
+}
+
+func NewPropr(ctx *cli.Context) (*Propr, error) {
+	// Create a new Propr instance with default configuration
+	propr := &Propr{
+		model:  CONFIG.Data.Model,
+		branch: "",
+	}
+
+	// If no context is provided, just return the default instance
+	if ctx == nil {
+		return propr, nil
+	}
+
+	// Handle branch selection
+	if ctx.Bool("branch") {
+		selectedBranch, err := selectBranch()
+		if err != nil {
+			return nil, err
+		}
+		propr.branch = selectedBranch
+	}
+
+	// Handle model selection
+	if ctx.Bool("model") {
+		selectedModel, err := selectModel()
+		if err != nil {
+			return nil, err
+		}
+		propr.model = selectedModel
+	}
+
+	return propr, nil
 }
 
 func (p *Propr) Generate(target string) (string, error) {
@@ -86,12 +183,17 @@ func (p *Propr) Generate(target string) (string, error) {
 		target = gh.repo.GetDefaultBranch()
 	}
 
-	current, err := getCurrentBranch()
-	if err != nil {
-		return "", err
+	// Use the branch from the Propr instance if set, otherwise use the current branch
+	current := p.branch
+	if current == "" {
+		var err error
+		current, err = getCurrentBranch()
+		if err != nil {
+			return "", err
+		}
 	}
 
-	log.Debug("Fetching diff", "target", target)
+	log.Debug("Fetching diff", "target", target, "current", current)
 	diff, err := getDiff(current, target)
 	if err != nil {
 		return "", err
@@ -146,7 +248,7 @@ func (p *Propr) Generate(target string) (string, error) {
 
 		log.Debug("Constructed messages to send to the provider", "messages", messages)
 
-		client := NewMessageClient()
+		client := NewMessageClient(p.model)
 		systemMessage := generateSystemMessageForDiff(CONFIG.Data.Prompt, CONFIG.Data.Template)
 		log.Debug("Constructed system instructions", "message", systemMessage)
 
@@ -181,9 +283,14 @@ func (p *Propr) Create(target string, description string, draft bool) error {
 		return nil
 	}
 
-	branch, err := getCurrentBranch()
-	if err != nil {
-		return err
+	// Use the branch from the Propr instance if set, otherwise use the current branch
+	branch := p.branch
+	if branch == "" {
+		var err error
+		branch, err = getCurrentBranch()
+		if err != nil {
+			return err
+		}
 	}
 
 	owner := gh.repo.GetOwner().GetLogin()
