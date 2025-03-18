@@ -81,7 +81,7 @@ func main() {
 					&cli.BoolFlag{
 						Name:    "branch",
 						Aliases: []string{"b"},
-						Usage:   "Select a branch from a list",
+						Usage:   "Select a target branch to merge into",
 					},
 					&cli.BoolFlag{
 						Name:    "model",
@@ -147,7 +147,7 @@ func main() {
 					&cli.BoolFlag{
 						Name:    "branch",
 						Aliases: []string{"b"},
-						Usage:   "Select a branch from a list",
+						Usage:   "Select a target branch to merge into",
 					},
 					&cli.BoolFlag{
 						Name:    "model",

@@ -108,7 +108,7 @@ func selectBranch() (string, error) {
 
 	var selectedBranch string
 	err = huh.NewSelect[string]().
-		Title("Select a branch").
+		Title("Select a target branch to merge into").
 		Options(options...).
 		Value(&selectedBranch).
 		Filtering(true).
@@ -141,14 +141,14 @@ func selectModel() (SupportedModel, error) {
 
 type Propr struct {
 	model  SupportedModel
-	branch string
+	target string
 }
 
 func NewPropr(ctx *cli.Context) (*Propr, error) {
 	// Create a new Propr instance with default configuration
 	propr := &Propr{
 		model:  CONFIG.Data.Model,
-		branch: "",
+		target: "",
 	}
 
 	// If no context is provided, just return the default instance
@@ -162,7 +162,7 @@ func NewPropr(ctx *cli.Context) (*Propr, error) {
 		if err != nil {
 			return nil, err
 		}
-		propr.branch = selectedBranch
+		propr.target = selectedBranch
 	}
 
 	// Handle model selection
@@ -179,18 +179,18 @@ func NewPropr(ctx *cli.Context) (*Propr, error) {
 
 func (p *Propr) Generate(target string) (string, error) {
 	gh := NewGitHub()
-	if target == "" {
+
+	// Use the target from the Propr instance if set, otherwise use the provided target or default branch
+	if p.target != "" {
+		target = p.target
+	} else if target == "" {
 		target = gh.repo.GetDefaultBranch()
 	}
 
-	// Use the branch from the Propr instance if set, otherwise use the current branch
-	current := p.branch
-	if current == "" {
-		var err error
-		current, err = getCurrentBranch()
-		if err != nil {
-			return "", err
-		}
+	// Get the current branch where changes are present
+	current, err := getCurrentBranch()
+	if err != nil {
+		return "", err
 	}
 
 	log.Debug("Fetching diff", "target", target, "current", current)
@@ -268,7 +268,11 @@ func (p *Propr) Generate(target string) (string, error) {
 
 func (p *Propr) Create(target string, description string, draft bool) error {
 	gh := NewGitHub()
-	if target == "" {
+
+	// Use the target from the Propr instance if set, otherwise use the provided target or default branch
+	if p.target != "" {
+		target = p.target
+	} else if target == "" {
 		target = gh.repo.GetDefaultBranch()
 	}
 
@@ -283,14 +287,10 @@ func (p *Propr) Create(target string, description string, draft bool) error {
 		return nil
 	}
 
-	// Use the branch from the Propr instance if set, otherwise use the current branch
-	branch := p.branch
-	if branch == "" {
-		var err error
-		branch, err = getCurrentBranch()
-		if err != nil {
-			return err
-		}
+	// Get the current branch where changes are present
+	branch, err := getCurrentBranch()
+	if err != nil {
+		return err
 	}
 
 	owner := gh.repo.GetOwner().GetLogin()
