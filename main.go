@@ -198,14 +198,29 @@ func main() {
 							models := huh.NewOptions(SupportedModels...)
 							form := huh.NewForm(
 								huh.NewGroup(
-									huh.NewSelect[SupportedModel]().Title("Model").Description("Configure the default model").Options(models...).Value(&CONFIG.Data.Model),
-									huh.NewText().Title("Prompt").Description("Configure the default prompt").CharLimit(99999).Value(&CONFIG.Data.Prompt),
+									huh.NewSelect[SupportedModel]().
+										Title("Model").
+										Description("Configure the default model").
+										Options(models...).
+										Value(&CONFIG.Data.Model).
+										Height(10),
+									huh.NewText().
+										Title("Prompt").
+										Description("Configure the default prompt").
+										CharLimit(99999).
+										Value(&CONFIG.Data.Prompt),
 								),
 								huh.NewGroup(
-									huh.NewText().Title("Template").Description("Configure the default template").Value(&CONFIG.Data.Template),
+									huh.NewText().
+										Title("Template").
+										Description("Configure the default template").
+										Value(&CONFIG.Data.Template),
 								),
 								huh.NewGroup(
-									huh.NewConfirm().Title("Pretty Print").Description("Do you want to pretty print the generated output?").Value(&CONFIG.Data.PrettyPrint),
+									huh.NewConfirm().
+										Title("Pretty Print").
+										Description("Do you want to pretty print the generated output?").
+										Value(&CONFIG.Data.PrettyPrint),
 								),
 							)
 

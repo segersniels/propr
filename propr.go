@@ -112,6 +112,7 @@ func selectBranch() (string, error) {
 		Options(options...).
 		Value(&selectedBranch).
 		Filtering(true).
+		Height(10).
 		Run()
 
 	if err != nil {
@@ -130,6 +131,7 @@ func selectModel() (SupportedModel, error) {
 		Options(options...).
 		Value(&selectedModel).
 		Filtering(true).
+		Height(10).
 		Run()
 
 	if err != nil {
