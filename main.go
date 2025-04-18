@@ -27,7 +27,7 @@ type Config struct {
 }
 
 var CONFIG = config.NewConfig("propr", Config{
-	Model:       GPT4oMini,
+	Model:       GPT4Dot1Mini,
 	Prompt:      SYSTEM_MESSAGE,
 	Template:    "# Description",
 	PrettyPrint: true,
